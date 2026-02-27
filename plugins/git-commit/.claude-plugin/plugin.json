@@ -1,5 +1,5 @@
 {
   "name": "git-commit",
-  "description": "Git commit formatting skill based on a post by Chris Beams: https://cbea.ms/git-commit/",
+  "description": "Formats git commit messages following Conventional Commits v1.0.0 with cbeams prose quality guidelines",
   "version": "1.0.0"
 }

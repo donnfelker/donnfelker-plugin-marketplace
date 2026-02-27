@@ -1,0 +1,6 @@
+{
+  "name": "codebase-analyzer",
+  "description": "Comprehensive multi-phase codebase technical analysis. Analyzes architecture, code quality, testing, infrastructure, and generates a detailed engineering report.",
+  "version": "1.0.0",
+  "license": "MIT"
+}

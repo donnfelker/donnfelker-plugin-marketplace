@@ -1,5 +1,5 @@
 ---
-name: git-commit-formatter
+name: git-commit
 description: Formats git commit messages following the seven rules of great git commit messages. This skill should be used when the user says "commit this", "make a commit", "write a commit message", "help with commit message format", or when writing, reviewing, reformatting, or improving git commit messages, commit message style, wording, or subject lines.
 ---
 

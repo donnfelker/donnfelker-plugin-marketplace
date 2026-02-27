@@ -1,0 +1,5 @@
+{
+  "name": "git-worktree",
+  "description": "Manages git worktrees including listing, creating, removing, and switching between worktrees with consistent naming conventions",
+  "version": "1.0.0"
+}

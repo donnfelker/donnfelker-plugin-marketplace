@@ -13,6 +13,16 @@
       "name": "git-commit",
       "source": "./plugins/git-commit",
       "description": "Git commit formatting and creation skill based on a set of solid Git commit message rules by Chris Beams: https://cbea.ms/git-commit/"
+    },
+    {
+      "name": "git-worktree",
+      "source": "./plugins/git-worktree",
+      "description": "Manages git worktrees including listing, creating, removing, and switching between worktrees with consistent naming conventions"
+    },
+    {
+      "name": "codebase-analyzer",
+      "source": "./plugins/codebase-analyzer",
+      "description": "Comprehensive multi-phase codebase technical analysis. Analyzes architecture, code quality, testing, infrastructure, and generates a detailed engineering report."
     }
   ]
 }

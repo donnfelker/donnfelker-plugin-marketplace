@@ -18,6 +18,7 @@ Plugins are packages of skills, commands, agents, and hooks that extend Claude C
 | Plugin | Description |
 |--------|-------------|
 | [git-commit](plugins/git-commit/) | Git commit formatting skill based on Chris Beams' seven rules of great git commit messages |
+| [codebase-analyzer](plugins/codebase-analyzer/) | Multi-phase technical analysis of codebases covering architecture, code quality, testing, and infrastructure |
 <!-- PLUGINS:END -->
 
 ## Installation

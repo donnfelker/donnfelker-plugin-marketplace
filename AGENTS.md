@@ -147,6 +147,15 @@ Follow the formatting rules in the `git-commit` skill at `plugins/git-commit/ski
 - [ ] `description` is 1-1024 chars with trigger phrases
 - [ ] `SKILL.md` is under 500 lines
 - [ ] No sensitive data or credentials
+- [ ] Plugin added to the Available Plugins table in `README.md`
+- [ ] `CHANGELOG.md` updated with the change
+
+### Keeping README and CHANGELOG in Sync
+
+Anytime a plugin, skill, hook, subagent, or utility in this repo is added, removed, or modified:
+
+1. **Update `README.md`** — Add or update the entry in the Available Plugins table (`<!-- PLUGINS:START -->` / `<!-- PLUGINS:END -->`)
+2. **Update `CHANGELOG.md`** — Add a dated entry describing the change. If a new plugin is added, also add it to the version table at the top
 
 
 ## Checking for Updates

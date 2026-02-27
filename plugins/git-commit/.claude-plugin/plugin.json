@@ -1,0 +1,5 @@
+{
+  "name": "git-commit",
+  "description": "Git commit formatting skill based on a post by Chris Beams: https://cbea.ms/git-commit/",
+  "version": "1.0.0"
+}

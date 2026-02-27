@@ -111,8 +111,10 @@ The `description` is critical for skill discovery. Include:
 2. When to use it (trigger phrases)
 3. Related skills for scope boundaries
 
+Always write the description as a single line. Do not use YAML block scalars (`>`, `|`, `>-`, `|-`). The description must be under 1024 characters.
+
 ```yaml
-description: When the user wants to optimize conversions on any marketing page. Use when the user says "CRO," "conversion rate optimization," "this page isn't converting." For signup flows, see signup-flow-cro.
+description: When the user wants to format a git commit message. Use when the user mentions "commit this," "write a commit message," or "commit format." For code review, see code-review.
 ```
 
 ## Claude Code Plugin

@@ -12,25 +12,6 @@ Run into a problem or have a question? [Open an issue](https://github.com/donnfe
 
 Plugins are packages of skills, commands, agents, and hooks that extend Claude Code with specialized capabilities. Each plugin in this marketplace focuses on a specific engineering workflow and can be installed independently.
 
-## How Plugins Work
-
-Unlike a single monolithic plugin, each plugin here is independent. Install only what you need for your workflow.
-
-```
-donnfelker-plugins (marketplace)
-│
-├── Git & Dev Workflow
-│   └── git-commit
-│
-├── Documentation (coming soon)
-│
-├── Code Review (coming soon)
-│
-├── Technical Analysis (coming soon)
-│
-└── Presentations & Media (coming soon)
-```
-
 ## Available Plugins
 
 <!-- PLUGINS:START -->

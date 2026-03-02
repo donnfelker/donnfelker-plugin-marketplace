@@ -23,6 +23,11 @@
       "name": "codebase-analyzer",
       "source": "./plugins/codebase-analyzer",
       "description": "Comprehensive multi-phase codebase technical analysis. Analyzes architecture, code quality, testing, infrastructure, and generates a detailed engineering report."
+    },
+    {
+      "name": "generate-release-notes",
+      "source": "./plugins/generate-release-notes",
+      "description": "Generates release notes and changelogs from conventional commit messages parsed from git log history"
     }
   ]
 }

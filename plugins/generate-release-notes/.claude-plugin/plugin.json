@@ -1,0 +1,5 @@
+{
+  "name": "generate-release-notes",
+  "description": "Generates release notes and changelogs from conventional commit messages parsed from git log history",
+  "version": "1.0.0"
+}

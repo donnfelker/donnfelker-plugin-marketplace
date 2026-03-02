@@ -39,7 +39,7 @@ These rules are **mandatory**. They follow the Conventional Commits v1.0.0 spec 
 12. If included as a footer, a breaking change MUST consist of the uppercase text `BREAKING CHANGE`, followed by a colon, space, and description.
 13. If included in the type/scope prefix, breaking changes MUST be indicated by a `!` immediately before the `:`. If `!` is used, `BREAKING CHANGE:` MAY be omitted from the footer section, and the commit description SHALL be used to describe the breaking change.
 14. Types other than `feat` and `fix` MAY be used in commit messages.
-15. The units of information that make up Conventional Commits MUST NOT be treated as case sensitive by implementors, with the exception of `BREAKING CHANGE` which MUST be uppercase.
+15. The units of information that make up Conventional Commits MUST NOT be treated as case sensitive by implementors, with the exception of `BREAKING CHANGE` which MUST be uppercase. **Note:** This rule governs parser tolerance, not authoring style. Always use lowercase types (`feat`, `fix`, etc.) to match ecosystem conventions and tooling expectations.
 16. `BREAKING-CHANGE` MUST be synonymous with `BREAKING CHANGE` when used as a token in a footer.
 
 ## Allowed Types

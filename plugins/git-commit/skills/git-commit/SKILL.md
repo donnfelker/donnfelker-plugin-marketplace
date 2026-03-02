@@ -160,7 +160,12 @@ feat!: send email to customer when product is shipped
 ### Revert commit
 
 ```
-revert: let us never again speak of the noodle incident
+revert: remove broken rate limiter from public API
+
+The token bucket implementation introduced in a215868 rejected
+legitimate burst traffic from webhook consumers. Reverting until
+the algorithm accounts for authenticated clients with higher
+quotas.
 
 Refs: 676104e, a215868
 ```

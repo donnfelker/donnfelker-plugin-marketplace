@@ -8,8 +8,12 @@ Current versions of all plugins. Compare against local versions to check for upd
 | codebase-analyzer | 1.0.0 | 2026-02-27 |
 | git-worktree | 1.0.0 | 2026-02-27 |
 | generate-release-notes | 1.0.0 | 2026-03-02 |
+| pr-title | 1.0.0 | 2026-03-11 |
 
 ## Recent Changes
+
+### 2026-03-11
+- Added `pr-title` plugin for generating PR titles following the Conventional Commits specification
 
 ### 2026-03-02
 - Added `generate-release-notes` plugin for generating release notes and changelogs from conventional commit messages

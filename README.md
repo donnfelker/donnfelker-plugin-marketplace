@@ -21,6 +21,7 @@ Plugins are packages of skills, commands, agents, and hooks that extend Claude C
 | [codebase-analyzer](plugins/codebase-analyzer/) | Multi-phase technical analysis of codebases covering architecture, code quality, testing, and infrastructure |
 | [git-worktree](plugins/git-worktree/) | Manages git worktrees for parallel branch development with consistent naming conventions |
 | [generate-release-notes](plugins/generate-release-notes/) | Generates release notes and changelogs from [Conventional Commits](https://www.conventionalcommits.org/) parsed from git log history |
+| [pr-title](plugins/pr-title/) | Generates PR titles following the [Conventional Commits v1.0.0](https://www.conventionalcommits.org/) specification |
 <!-- PLUGINS:END -->
 
 ## Installation

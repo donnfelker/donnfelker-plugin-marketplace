@@ -42,7 +42,7 @@ We adopt the prose quality principles that Conventional Commits underspecifies:
 
 ### What We Deliberately Omitted
 
-**The 50-character subject line limit.** The cbeams approach recommends keeping subject lines to 50 characters with 72 as a hard limit. The Conventional Commits type and scope prefix consumes significant character budget before the description even begins — `feat(parser): ` is already 15 characters. Imposing a 50-character total would leave roughly 35 characters for the actual description, which is too constraining to write meaningful imperative sentences. We retain 72 characters as the hard limit for the full subject line, which is the point at which GitHub truncates with an ellipsis.
+**The 100-character subject line limit.** The cbeams approach recommends keeping subject lines to 50 characters with 72 as a hard limit. The Conventional Commits type and scope prefix consumes significant character budget before the description even begins — `feat(parser): ` is already 15 characters. Adding an optional ticket ID (e.g., `tos-122`) consumes even more. Imposing a 50- or even 72-character total would leave too few characters for a meaningful imperative description. We use 100 characters as the hard limit for the full subject line, which provides enough room for type, scope, ticket, and a clear description while still fitting comfortably in GitHub's PR and commit list views.
 
 **The capitalization rule.** The cbeams approach requires capitalizing the first letter of the subject line. In Conventional Commits, the subject line begins with a lowercase type prefix (`feat`, `fix`, etc.), and the community convention is to continue in lowercase after the colon. We follow the Conventional Commits convention here for consistency with the broader ecosystem and its tooling.
 
@@ -61,7 +61,7 @@ For **long-term maintainability**, the combination of structure and prose create
 ### Message Format
 
 ```
-<type>[optional scope]: <description>
+<type>[optional scope]: [optional ticket] <description>
 
 [optional body]
 
@@ -93,14 +93,14 @@ Any type combined with `BREAKING CHANGE` in the footer or `!` after the type/sco
 docs: correct spelling in CHANGELOG
 ```
 
-**Scoped feature:**
+**Scoped feature with ticket:**
 ```
-feat(lang): add Polish language support
+feat(lang): tos-122 add Polish language support
 ```
 
-**Fix with body explaining why:**
+**Fix with ticket and body explaining why:**
 ```
-fix(api): add rate limiting to public endpoints
+fix(api): tos-234 add rate limiting to public endpoints
 
 The public API was vulnerable to abuse through excessive requests.
 This adds a token bucket algorithm limiting clients to 100 requests
@@ -109,9 +109,9 @@ per minute, with appropriate 429 responses when exceeded.
 Refs: #234
 ```
 
-**Breaking change:**
+**Breaking change with ticket:**
 ```
-feat(auth)!: replace session-based auth with JWT tokens
+feat(auth)!: tos-891 replace session-based auth with JWT tokens
 
 Replace session-based authentication with stateless JWT tokens to
 enable horizontal scaling. Sessions required sticky load balancing

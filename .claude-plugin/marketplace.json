@@ -28,6 +28,11 @@
       "name": "generate-release-notes",
       "source": "./plugins/generate-release-notes",
       "description": "Generates release notes and changelogs from conventional commit messages parsed from git log history"
+    },
+    {
+      "name": "pr-title",
+      "source": "./plugins/pr-title",
+      "description": "Generates PR titles following the Conventional Commits v1.0.0 specification"
     }
   ]
 }

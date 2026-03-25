@@ -7,27 +7,29 @@ description: Generates PR titles following the Conventional Commits specificatio
 
 Generate pull request titles following the [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) specification. PR titles use the same type/scope/description format as commit messages, but are limited to a single subject line — no body or footers.
 
-This project enforces PR title format via the `amannn/action-semantic-pull-request` GitHub Action, so a malformed title will block the PR from merging.
+When the `amannn/action-semantic-pull-request` GitHub Action is configured (check `.github/workflows/` for a PR title lint workflow), a malformed title will block the PR from merging.
 
 ## Gather Context
 
 Before writing a PR title, understand what the PR actually changes:
 
-1. Run `git log main..HEAD --oneline` to see all commits on the branch.
-2. Run `git diff main...HEAD --stat` to see which files changed and by how much.
-3. If the commits and stat summary aren't enough to understand the intent, run `git diff main...HEAD` for the full diff.
+1. Detect the default branch: `git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'` (falls back to `main` if not set).
+2. Run `git log <default-branch>..HEAD --oneline` to see all commits on the branch.
+3. Run `git diff <default-branch>...HEAD --stat` to see which files changed and by how much.
+4. If the commits and stat summary aren't enough to understand the intent, run `git diff <default-branch>...HEAD` for the full diff.
 
 Use this context to write an accurate, specific title that captures the overall purpose of the PR — not just the last commit.
 
 ## Title Format
 
 ```
-<type>[optional scope]: [optional ticket] <description>
+<type>[optional scope][optional !]: [optional ticket] <description>
 ```
 
 - **type** — one of the allowed types below (always lowercase)
 - **scope** — a noun in parentheses identifying the area of the codebase (optional, but use it when it adds clarity)
-- **ticket** — if a Linear ticket is associated, include the ticket ID in lowercase (e.g., `tos-123`) after the colon and space, before the description. Look for ticket IDs in branch names, commit messages, or ask the user if not obvious.
+- **!** — append after the scope (or type if no scope) to signal a **breaking change** (e.g., `feat(api)!:` or `feat!:`). Use this when the change is not backwards-compatible.
+- **ticket** — if an issue tracker ticket is associated (Linear, Jira, GitHub issue, etc.), include the ticket ID after the colon and space, before the description. Use lowercase for alphanumeric IDs (e.g., `proj-123`, `proj-456`). Look for ticket IDs in branch names, commit messages, or ask the user if not obvious.
 - **description** — a concise summary of the change
 
 ## Allowed Types
@@ -66,20 +68,22 @@ When a PR contains multiple commits with different types, choose the type that b
 Use a scope when it helps the reader quickly understand which part of the codebase is affected. Good scopes are short nouns that match how the team talks about the codebase:
 
 - `feat(auth):` — authentication system
-- `fix(leaderboard):` — leaderboard feature
+- `fix(dashboard):` — dashboard feature
 - `ci(deploy):` — deployment pipeline
 - `refactor(feed):` — social feed
 
 Omit the scope if the change is broad or the type alone is descriptive enough (e.g., `docs: update README` doesn't need a scope).
 
+Scopes are always lowercase kebab-case even when they refer to a PascalCase component or CamelCase module — the description can still use the real name. For example, `refactor(user-profile)!: rename UserProfile to MemberCard` is correct: the scope is kebab-case, the description uses the actual component names.
+
 ## Examples
 
 ```
-feat(crew): tos-456 add crew invitation flow
+feat(invoices): proj-456 add invoice creation flow
 ```
 
 ```
-fix(leaderboard): tos-789 resolve crash from firebase-admin import
+fix(dashboard): proj-789 resolve null pointer in dashboard data fetch
 ```
 
 ```
@@ -87,7 +91,7 @@ ci: replace commitlint workflow with semantic PR title check
 ```
 
 ```
-refactor(auth): tos-234 extract token refresh into dedicated service
+refactor(auth): proj-234 extract token refresh into dedicated service
 ```
 
 ```
@@ -95,5 +99,5 @@ docs: add conventional commits documentation
 ```
 
 ```
-feat(chat)!: tos-891 replace Stream Chat with custom implementation
+feat(chat)!: proj-891 replace Stream Chat with custom implementation
 ```

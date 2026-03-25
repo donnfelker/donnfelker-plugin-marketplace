@@ -138,7 +138,7 @@ See [Claude Code plugins documentation](https://code.claude.com/docs/en/plugins.
 
 ### Commit Messages
 
-Follow the formatting rules in the `git-commit` skill at `plugins/git-commit/skills/git-commit/SKILL.md`.
+ALWAYS invoke the `git-commit` skill before writing any commit message. The skill is located at `plugins/git-commit/skills/git-commit/SKILL.md`. Read it and follow its formatting rules for every commit.
 
 ### Pull Request Checklist
 

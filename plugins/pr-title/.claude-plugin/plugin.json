@@ -1,0 +1,5 @@
+{
+  "name": "pr-title",
+  "description": "Generates PR titles following the Conventional Commits v1.0.0 specification",
+  "version": "1.0.0"
+}

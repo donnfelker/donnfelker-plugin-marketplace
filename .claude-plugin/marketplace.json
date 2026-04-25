@@ -30,6 +30,11 @@
       "description": "Generates release notes and changelogs from conventional commit messages parsed from git log history"
     },
     {
+      "name": "pr-title",
+      "source": "./plugins/pr-title",
+      "description": "Generates PR titles following the Conventional Commits v1.0.0 specification"
+    },
+    {
       "name": "code-review",
       "source": "./plugins/code-review",
       "description": "Multi-reviewer code review orchestrator. Runs a comprehensive review, security review, codex review, and codex adversarial review in parallel and combines their findings into one prioritized, timestamped report."

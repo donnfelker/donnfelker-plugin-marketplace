@@ -21,6 +21,7 @@ Plugins are packages of skills, commands, agents, and hooks that extend Claude C
 | [codebase-analyzer](plugins/codebase-analyzer/) | Multi-phase technical analysis of codebases covering architecture, code quality, testing, and infrastructure |
 | [git-worktree](plugins/git-worktree/) | Manages git worktrees for parallel branch development with consistent naming conventions |
 | [generate-release-notes](plugins/generate-release-notes/) | Generates release notes and changelogs from [Conventional Commits](https://www.conventionalcommits.org/) parsed from git log history |
+| [pr-title](plugins/pr-title/) | Generates PR titles following the [Conventional Commits v1.0.0](https://www.conventionalcommits.org/) specification |
 <!-- PLUGINS:END -->
 
 ## Installation
@@ -128,6 +129,28 @@ Or invoke skills directly:
 
 ### Presentations & Media
 - Coming soon
+
+## GitHub Workflow: PR Title Validation
+
+This repository includes a GitHub Actions workflow (`.github/workflows/pr-lint-title.yml`) that validates PR titles against the [Conventional Commits](https://www.conventionalcommits.org/) format using [`amannn/action-semantic-pull-request`](https://github.com/amannn/action-semantic-pull-request).
+
+The workflow runs on every PR open, reopen, and title edit. It enforces that the PR title follows the `type(scope): description` format with a valid type and a lowercase description. If the title doesn't match, the check fails and the PR is blocked from merging.
+
+This matters because GitHub's **squash merge** uses the PR title as the resulting commit message. By validating the title at the PR level, every merged commit on `main` is guaranteed to follow Conventional Commits — even if individual branch commits don't. This keeps `git log` clean and enables automated changelog generation, semantic versioning, and commit classification.
+
+### Enforced Rules
+
+- **Type** must be one of: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+- **Description** must start with a lowercase letter
+- **Format**: `type(scope): [ticket] description`
+
+### Example
+
+```
+feat(auth): tos-123 add login support
+```
+
+If a PR title fails validation, the error message includes the expected format and a tip to use the `/pr-title` skill for auto-formatting.
 
 ## Contributing
 

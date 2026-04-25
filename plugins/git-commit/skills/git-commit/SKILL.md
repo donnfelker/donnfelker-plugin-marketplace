@@ -14,12 +14,14 @@ Before writing a commit message, run `git diff --staged` to see what is being co
 ## Message Structure
 
 ```
-<type>[optional scope]: <description>
+<type>[optional scope]: [optional ticket] <description>
 
 [optional body]
 
 [optional footer(s)]
 ```
+
+If a Linear ticket is associated with the change, include the ticket ID in lowercase (e.g., `tos-122`) immediately after the colon and space, before the description. Ask the user for the ticket number if one is not obvious from context. If there is no related ticket, omit it.
 
 ## Conventional Commits Specification
 
@@ -29,7 +31,7 @@ These rules are **mandatory**. They follow the Conventional Commits v1.0.0 spec 
 2. The type `feat` MUST be used when a commit adds a new feature to the application or library.
 3. The type `fix` MUST be used when a commit represents a bug fix.
 4. A scope MAY be provided after a type. A scope MUST consist of a noun describing a section of the codebase surrounded by parentheses, e.g., `fix(parser):`.
-5. A description MUST immediately follow the colon and space after the type/scope prefix. The description is a short summary of the code changes.
+5. A description MUST immediately follow the colon and space after the type/scope prefix. If a Linear ticket is associated, the ticket ID in lowercase (e.g., `tos-122`) MUST appear before the description, separated by a space. The description is a short summary of the code changes.
 6. A longer commit body MAY be provided after the short description. The body MUST begin one blank line after the description.
 7. A commit body is free-form and MAY consist of any number of newline-separated paragraphs.
 8. One or more footers MAY be provided one blank line after the body. Each footer MUST consist of a word token, followed by either `:<space>` or `<space>#` separator, followed by a string value.
@@ -39,7 +41,7 @@ These rules are **mandatory**. They follow the Conventional Commits v1.0.0 spec 
 12. If included as a footer, a breaking change MUST consist of the uppercase text `BREAKING CHANGE`, followed by a colon, space, and description.
 13. If included in the type/scope prefix, breaking changes MUST be indicated by a `!` immediately before the `:`. If `!` is used, `BREAKING CHANGE:` MAY be omitted from the footer section, and the commit description SHALL be used to describe the breaking change.
 14. Types other than `feat` and `fix` MAY be used in commit messages.
-15. The units of information that make up Conventional Commits MUST NOT be treated as case sensitive by implementors, with the exception of `BREAKING CHANGE` which MUST be uppercase. **Note:** This rule governs parser tolerance, not authoring style. Always use lowercase types (`feat`, `fix`, etc.) to match ecosystem conventions and tooling expectations.
+15. The units of information that make up Conventional Commits MUST NOT be treated as case sensitive by implementors, with the exception of `BREAKING CHANGE` which MUST be uppercase. Note: This rule governs parser tolerance, not authoring style. Always use lowercase types (`feat`, `fix`, etc.) to match ecosystem conventions and tooling expectations.
 16. `BREAKING-CHANGE` MUST be synonymous with `BREAKING CHANGE` when used as a token in a footer.
 
 ## Allowed Types
@@ -72,7 +74,7 @@ These guidelines augment the Conventional Commits spec to improve human readabil
 
 - **Use imperative mood** in the description: "Add feature" not "Added feature" or "Adds feature". A properly formed description should complete the sentence: "If applied, this commit will ___."
 - **Do not end the description with a period.** Trailing punctuation wastes space and adds no clarity.
-- **Keep the description concise.** The full subject line (type, scope, and description combined) should stay under 72 characters as a hard limit.
+- **Keep the description concise.** The full subject line (type, scope, and description combined) should stay under 100 characters as a hard limit.
 
 ### Body
 
@@ -95,33 +97,34 @@ When formatting a commit message:
 1. Select the correct type from the allowed types table
 2. Add a scope in parentheses if it clarifies which part of the codebase is affected
 3. Append `!` before `:` if the change is a breaking change
-4. Write the description in imperative mood after the colon and space
-5. Ensure the full subject line stays under 72 characters
-6. If a body is needed, add a blank line after the subject
-7. Wrap all body lines at 72 characters
-8. Focus the body on motivation and context, not implementation details
-9. Add footers after a blank line using git-trailer format
-10. Include `BREAKING CHANGE: <description>` in the footer for breaking changes (required if `!` is omitted from the prefix)
-11. Add issue references and other metadata as footers (e.g., `Refs: #123`)
+4. If a Linear ticket is associated, include the ticket ID in lowercase (e.g., `tos-122`) after the colon and space, before the description. Ask the user if unsure.
+5. Write the description in imperative mood
+6. Ensure the full subject line stays under 100 characters
+7. If a body is needed, add a blank line after the subject
+8. Wrap all body lines at 72 characters
+9. Focus the body on motivation and context, not implementation details
+10. Add footers after a blank line using git-trailer format
+11. Include `BREAKING CHANGE: <description>` in the footer for breaking changes (required if `!` is omitted from the prefix)
+12. Add issue references and other metadata as footers (e.g., `Refs: #123`)
 
 ## Examples
 
-### Simple commit (no body needed)
+### Simple commit, no ticket
 
 ```
 docs: correct spelling in CHANGELOG
 ```
 
-### Commit with scope
+### Commit with scope and ticket
 
 ```
-feat(lang): add Polish language support
+feat(lang): tos-122 add Polish language support
 ```
 
-### Commit with body explaining why
+### Commit with ticket and body explaining why
 
 ```
-fix(api): add rate limiting to public endpoints
+fix(api): tos-234 add rate limiting to public endpoints
 
 The public API was vulnerable to abuse through excessive requests.
 This adds a token bucket algorithm limiting clients to 100 requests
@@ -130,10 +133,10 @@ per minute, with appropriate 429 responses when exceeded.
 Refs: #234
 ```
 
-### Breaking change with `!` and footer
+### Breaking change with `!`, ticket, and footer
 
 ```
-feat(auth)!: replace session-based auth with JWT tokens
+feat(auth)!: tos-891 replace session-based auth with JWT tokens
 
 Replace session-based authentication with stateless JWT tokens to
 enable horizontal scaling. Sessions required sticky load balancing
@@ -151,7 +154,7 @@ Refs: #891
 See-also: #445, #892
 ```
 
-### Breaking change with `!` only (no footer)
+### Breaking change with `!` only (no footer, no ticket)
 
 ```
 feat!: send email to customer when product is shipped
@@ -170,10 +173,10 @@ quotas.
 Refs: 676104e, a215868
 ```
 
-### Multi-paragraph body with multiple footers
+### Multi-paragraph body with ticket and multiple footers
 
 ```
-fix(http): prevent racing of concurrent requests
+fix(http): tos-123 prevent racing of concurrent requests
 
 Introduce a request id and a reference to the latest request.
 Dismiss incoming responses other than from the latest request.

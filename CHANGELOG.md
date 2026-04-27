@@ -9,8 +9,12 @@ Current versions of all plugins. Compare against local versions to check for upd
 | git-worktree | 1.0.0 | 2026-02-27 |
 | generate-release-notes | 1.0.0 | 2026-03-02 |
 | pr-title | 1.0.0 | 2026-03-11 |
+| code-review | 1.0.0 | 2026-04-25 |
 
 ## Recent Changes
+
+### 2026-04-25
+- Added `code-review` plugin: multi-reviewer orchestrator that runs comprehensive, security, codex, and codex adversarial reviews in parallel and combines their findings into one prioritized, timestamped report
 
 ### 2026-03-11
 - Added `pr-title` plugin for generating PR titles following the Conventional Commits specification

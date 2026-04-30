@@ -1,0 +1,9 @@
+{
+  "name": "address-pr-comments",
+  "version": "0.1.0",
+  "description": "Helps address and resolve pull request review comments.",
+  "author": {
+    "name": "Donn Felker",
+    "email": "donnfelker@gmail.com"
+  }
+}

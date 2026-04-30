@@ -10,8 +10,12 @@ Current versions of all plugins. Compare against local versions to check for upd
 | generate-release-notes | 1.0.0 | 2026-03-02 |
 | pr-title | 1.0.0 | 2026-03-11 |
 | code-review | 1.0.0 | 2026-04-25 |
+| address-pr-comments | 0.1.0 | 2026-04-30 |
 
 ## Recent Changes
+
+### 2026-04-30
+- Added `address-pr-comments` plugin: walks through unresolved GitHub PR comments on the current branch, classifies actionable items, plans changes, applies them after user approval, then replies with the commit reference and resolves threads
 
 ### 2026-04-25
 - Added `code-review` plugin: multi-reviewer orchestrator that runs comprehensive, security, codex, and codex adversarial reviews in parallel and combines their findings into one prioritized, timestamped report

@@ -38,6 +38,11 @@
       "name": "code-review",
       "source": "./plugins/code-review",
       "description": "Multi-reviewer code review orchestrator. Runs a comprehensive review, security review, codex review, and codex adversarial review in parallel and combines their findings into one prioritized, timestamped report."
+    },
+    {
+      "name": "address-pr-comments",
+      "source": "./plugins/address-pr-comments",
+      "description": "Reviews and addresses unresolved GitHub PR comments on the current branch. Fetches comments, classifies actionable items, plans changes, applies them after user approval, then replies with the commit reference and resolves threads."
     }
   ]
 }

@@ -1,0 +1,5 @@
+{
+  "name": "plan-to-tickets",
+  "description": "Imports a structured planning document (implementation plan, design doc with tasks) into a task tracker (ClickUp, Linear, Jira, Asana, Notion, GitHub Projects) as a ticket hierarchy with dependencies wired. Includes a readiness check that refuses to import a half-baked plan, plus a markdown-file fallback when no tracker is connected.",
+  "version": "1.0.0"
+}

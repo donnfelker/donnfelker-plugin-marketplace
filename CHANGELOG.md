@@ -11,8 +11,12 @@ Current versions of all plugins. Compare against local versions to check for upd
 | pr-title | 1.0.0 | 2026-03-11 |
 | code-review | 1.0.0 | 2026-04-25 |
 | address-pr-comments | 0.1.0 | 2026-04-30 |
+| plan-to-tickets | 1.0.0 | 2026-05-19 |
 
 ## Recent Changes
+
+### 2026-05-19
+- Added `plan-to-tickets` plugin for importing structured planning documents into task trackers (ClickUp, Linear, Jira, Asana, Notion, GitHub Projects) as ticket hierarchies with dependencies wired
 
 ### 2026-04-30
 - Added `address-pr-comments` plugin: walks through unresolved GitHub PR comments on the current branch, classifies actionable items, plans changes, applies them after user approval, then replies with the commit reference and resolves threads

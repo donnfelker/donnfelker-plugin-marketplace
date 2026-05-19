@@ -43,6 +43,11 @@
       "name": "address-pr-comments",
       "source": "./plugins/address-pr-comments",
       "description": "Reviews and addresses unresolved GitHub PR comments on the current branch. Fetches comments, classifies actionable items, plans changes, applies them after user approval, then replies with the commit reference and resolves threads."
+    },
+    {
+      "name": "plan-to-tickets",
+      "source": "./plugins/plan-to-tickets",
+      "description": "Imports a structured planning document (implementation plan, design doc with tasks) into a task tracker (ClickUp, Linear, Jira, Asana, Notion, GitHub Projects) as a ticket hierarchy with dependencies wired. Includes a readiness check that refuses half-baked plans plus a markdown-file fallback when no tracker is connected."
     }
   ]
 }

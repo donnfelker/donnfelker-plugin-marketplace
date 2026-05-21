@@ -45,9 +45,9 @@
       "description": "Reviews and addresses unresolved GitHub PR comments on the current branch. Fetches comments, classifies actionable items, plans changes, applies them after user approval, then replies with the commit reference and resolves threads."
     },
     {
-      "name": "plan-to-tickets",
-      "source": "./plugins/plan-to-tickets",
-      "description": "Imports a structured planning document (implementation plan, design doc with tasks) into a task tracker (ClickUp, Linear, Jira, Asana, Notion, GitHub Projects) as a ticket hierarchy with dependencies wired. Includes a readiness check that refuses half-baked plans plus a markdown-file fallback when no tracker is connected."
+      "name": "durable-spec-development",
+      "source": "./plugins/durable-spec-development",
+      "description": "End-to-end durable spec workflow. Bundles plan-to-tickets (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown) and implement-full-spec (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review)."
     }
   ]
 }

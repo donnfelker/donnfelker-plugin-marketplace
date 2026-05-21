@@ -11,9 +11,15 @@ Current versions of all plugins. Compare against local versions to check for upd
 | pr-title | 1.0.0 | 2026-03-11 |
 | code-review | 1.0.0 | 2026-04-25 |
 | address-pr-comments | 0.1.0 | 2026-04-30 |
-| plan-to-tickets | 1.0.0 | 2026-05-19 |
+| durable-spec-development | 1.0.0 | 2026-05-21 |
 
 ## Recent Changes
+
+### 2026-05-21
+- Added `durable-spec-development` plugin bundling two skills for the durable spec lifecycle:
+  - `plan-to-tickets` — imports a structured planning document into ClickUp / Linear / Jira / Asana / Notion / GitHub Projects (or a markdown fallback) as a ticket hierarchy with dependencies wired. Migrated from the standalone `plan-to-tickets` plugin.
+  - `implement-full-spec` — turns a parent ticket with N actionable subtasks into N stacked pull requests, then drives the stack to merge-ready by addressing every bot and human review comment and cascading rebases across the stack.
+- Removed the standalone `plan-to-tickets` plugin; its skill now lives inside `durable-spec-development`.
 
 ### 2026-05-19
 - Added `plan-to-tickets` plugin for importing structured planning documents into task trackers (ClickUp, Linear, Jira, Asana, Notion, GitHub Projects) as ticket hierarchies with dependencies wired

@@ -1,0 +1,6 @@
+{
+  "name": "durable-spec-development",
+  "description": "End-to-end durable spec workflow: import a structured plan into a task tracker (ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown fallback) as a ticket hierarchy, then ship every actionable subtask as its own stacked pull request and drive each PR to merge-ready through multi-round bot and human review.",
+  "version": "1.0.0",
+  "license": "MIT"
+}

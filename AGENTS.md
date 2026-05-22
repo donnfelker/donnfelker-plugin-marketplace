@@ -62,7 +62,7 @@ description: What this skill does and when to use it. Include trigger phrases.
 - No consecutive hyphens (`--`)
 - Must match parent directory name exactly
 
-**Valid**: `git-commit`, `prd-generator`, `code-review`
+**Valid**: `git-commit`, `prd-generator`, `triangulated-code-review`
 **Invalid**: `Git-Commit`, `-prd`, `code--review`
 
 ### Optional Skill Directories

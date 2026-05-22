@@ -40,14 +40,9 @@
       "description": "Multi-reviewer code review orchestrator. Runs a comprehensive review, security review, codex review, and codex adversarial review in parallel and combines their findings into one prioritized, timestamped report."
     },
     {
-      "name": "address-pr-comments",
-      "source": "./plugins/address-pr-comments",
-      "description": "Reviews and addresses unresolved GitHub PR comments on the current branch. Fetches comments, classifies actionable items, plans changes, applies them after user approval, then replies with the commit reference and resolves threads."
-    },
-    {
       "name": "durable-spec-development",
       "source": "./plugins/durable-spec-development",
-      "description": "End-to-end durable spec workflow. Bundles plan-to-tickets (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown) and implement-full-spec (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review)."
+      "description": "End-to-end durable spec workflow. Bundles plan-to-tickets (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown), implement-full-spec (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review), and address-pr-comments (review and address unresolved GitHub PR comments on the current branch)."
     },
     {
       "name": "find-past-conversation",

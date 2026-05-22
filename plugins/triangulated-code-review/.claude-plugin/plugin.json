@@ -1,0 +1,6 @@
+{
+  "name": "triangulated-code-review",
+  "description": "Triangulated multi-reviewer code review orchestrator. Borrows from research methodology — checks each finding against multiple independent reviewers (comprehensive, security, codex, codex adversarial) to reduce blind spots, then combines their findings into one prioritized, timestamped report.",
+  "version": "1.1.0",
+  "license": "MIT"
+}

@@ -62,7 +62,7 @@ description: What this skill does and when to use it. Include trigger phrases.
 - No consecutive hyphens (`--`)
 - Must match parent directory name exactly
 
-**Valid**: `git-commit`, `prd-generator`, `code-review`
+**Valid**: `git-commit`, `prd-generator`, `triangulated-code-review`
 **Invalid**: `Git-Commit`, `-prd`, `code--review`
 
 ### Optional Skill Directories
@@ -114,7 +114,7 @@ The `description` is critical for skill discovery. Include:
 Always write the description as a single line. Do not use YAML block scalars (`>`, `|`, `>-`, `|-`). The description must be under 1024 characters.
 
 ```yaml
-description: When the user wants to format a git commit message. Use when the user mentions "commit this," "write a commit message," or "commit format." For code review, see code-review.
+description: When the user wants to format a git commit message. Use when the user mentions "commit this," "write a commit message," or "commit format." For code review, see triangulated-code-review.
 ```
 
 ## Claude Code Plugin

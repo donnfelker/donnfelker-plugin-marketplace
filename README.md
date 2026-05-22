@@ -25,6 +25,7 @@ Plugins are packages of skills, commands, agents, and hooks that extend Claude C
 | [triangulated-code-review](plugins/triangulated-code-review/) | Triangulated multi-reviewer code review orchestrator. Borrows from research methodology — checks each finding against multiple independent reviewers (comprehensive, security, codex, codex adversarial) to reduce blind spots, then combines their findings into one prioritized, timestamped report |
 | [address-pr-comments](plugins/address-pr-comments/) | Reviews and addresses unresolved GitHub PR comments on the current branch. Fetches comments, classifies actionable items, plans changes, applies them after approval, then replies with the commit reference and resolves threads |
 | [durable-spec-development](plugins/durable-spec-development/) | End-to-end durable spec workflow. Bundles `plan-to-tickets` (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown) and `implement-full-spec` (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review) |
+| [find-past-conversation](plugins/find-past-conversation/) | Searches past Claude Code session transcripts under `~/.claude/projects/` to find a previous conversation by recalled keyword or phrase, then optionally reports the outcome (commit, branch, PR opened, merged) |
 <!-- PLUGINS:END -->
 
 ## Installation

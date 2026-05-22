@@ -12,11 +12,13 @@ Current versions of all plugins. Compare against local versions to check for upd
 | triangulated-code-review | 1.1.0 | 2026-05-22 |
 | address-pr-comments | 0.1.0 | 2026-04-30 |
 | durable-spec-development | 1.0.0 | 2026-05-21 |
+| find-past-conversation | 1.0.0 | 2026-05-22 |
 
 ## Recent Changes
 
 ### 2026-05-22
 - Renamed `code-review` plugin to `triangulated-code-review` (v1.0.0 → v1.1.0). Borrows from research methodology, where you check a finding against multiple independent sources to reduce blind spots. Updates the plugin directory, skill name, manifest, description, and the report filename prefix (`triangulated-code-review-<timestamp>.md`).
+- Added `find-past-conversation` plugin: searches past Claude Code session transcripts under `~/.claude/projects/` to locate a previous conversation by recalled keyword or phrase. Reports session ID, project, date, and a short summary; on request, parses the transcript for commits, pushes, and PR URLs and reports the current PR state via `gh`. Includes guidance on JSON-aware extraction with `jq`, search-string hygiene, and skipping noisy subagent transcripts by default.
 
 ### 2026-05-21
 - Added `durable-spec-development` plugin bundling two skills for the durable spec lifecycle:

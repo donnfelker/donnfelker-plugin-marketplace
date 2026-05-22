@@ -43,6 +43,11 @@
       "name": "durable-spec-development",
       "source": "./plugins/durable-spec-development",
       "description": "End-to-end durable spec workflow. Bundles plan-to-tickets (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown), implement-full-spec (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review), and address-pr-comments (review and address unresolved GitHub PR comments on the current branch)."
+    },
+    {
+      "name": "find-past-conversation",
+      "source": "./plugins/find-past-conversation",
+      "description": "Searches past Claude Code session transcripts to find a previous conversation by recalled keyword or phrase, then optionally reports the outcome (commit, branch, PR opened, merged)."
     }
   ]
 }

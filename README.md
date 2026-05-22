@@ -24,6 +24,7 @@ Plugins are packages of skills, commands, agents, and hooks that extend Claude C
 | [pr-title](plugins/pr-title/) | Generates PR titles following the [Conventional Commits v1.0.0](https://www.conventionalcommits.org/) specification |
 | [code-review](plugins/code-review/) | Multi-reviewer code review orchestrator. Runs a comprehensive review, security review, codex review, and codex adversarial review in parallel and combines their findings into one prioritized, timestamped report |
 | [durable-spec-development](plugins/durable-spec-development/) | End-to-end durable spec workflow. Bundles `plan-to-tickets` (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown), `implement-full-spec` (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review), and `address-pr-comments` (review and address unresolved GitHub PR comments on the current branch) |
+| [find-past-conversation](plugins/find-past-conversation/) | Searches past Claude Code session transcripts under `~/.claude/projects/` to find a previous conversation by recalled keyword or phrase, then optionally reports the outcome (commit, branch, PR opened, merged) |
 <!-- PLUGINS:END -->
 
 ## Installation

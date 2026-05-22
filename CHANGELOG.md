@@ -16,7 +16,7 @@ Current versions of all plugins. Compare against local versions to check for upd
 ## Recent Changes
 
 ### 2026-05-21
-- Fleshed out `durable-spec-development/plan-to-tickets` Linear reference (`references/linear.md`): replaced the stub with concrete OAuth setup, MCP tool inventory, unified `save_issue` create/update semantics, `blockedBy` direction, project-icon validation footgun, and the `list_issues` output-cap workaround — captured from a real 56-ticket Linear import.
+- Fleshed out `durable-spec-development/plan-to-tickets` Linear reference (`references/linear.md`): replaced the stub with concrete OAuth setup, MCP tool inventory, unified `save_issue` create/update semantics, `blockedBy` direction, project-icon validation footgun, and the `list_issues` output-cap workaround — validated across a multi-phase Linear import.
 - Added `durable-spec-development` plugin bundling two skills for the durable spec lifecycle:
   - `plan-to-tickets` — imports a structured planning document into ClickUp / Linear / Jira / Asana / Notion / GitHub Projects (or a markdown fallback) as a ticket hierarchy with dependencies wired. Migrated from the standalone `plan-to-tickets` plugin.
   - `implement-full-spec` — turns a parent ticket with N actionable subtasks into N stacked pull requests, then drives the stack to merge-ready by addressing every bot and human review comment and cascading rebases across the stack.

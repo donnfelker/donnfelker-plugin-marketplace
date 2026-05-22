@@ -107,8 +107,6 @@ Safe default: **omit the `icon` field** unless the operator explicitly specifies
 
 `save_issue` creates parallelize cleanly when fired per-phase. Recommended ceiling: **10–15 parallel `save_issue` calls per turn**. Dependency wires (updates by `id`) are even safer to parallelize — they never contend.
 
-No 429s have been observed at this batch size across ~60 creates plus dependency wires in a single import.
-
 ## `list_issues` output-token gotcha
 
 For projects with 50+ issues, `mcp__linear-server__list_issues` returns a payload that exceeds the agent's output token cap. The harness saves the full result to a tool-results file and returns the path in the error:

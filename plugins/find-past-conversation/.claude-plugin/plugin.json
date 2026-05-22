@@ -1,0 +1,9 @@
+{
+  "name": "find-past-conversation",
+  "version": "1.0.0",
+  "description": "Searches past Claude Code session transcripts to find a previous conversation by recalled keyword or phrase, then optionally reports the outcome (commit, branch, PR opened, merged).",
+  "author": {
+    "name": "Donn Felker",
+    "email": "donnfelker@gmail.com"
+  }
+}

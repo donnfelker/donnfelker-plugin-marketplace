@@ -79,13 +79,16 @@ prompt:
 You are performing a comprehensive code review of the pending git changes in <CWD>.
 
 Steps:
-1. Read the review rubric at: <SKILL_DIR>/references/review-guidelines.md
-2. Run `git diff <BASE_SHA>...HEAD` and `git diff HEAD` to see all changes (committed-but-unmerged AND working-tree).
-3. Apply the rubric strictly. Only flag what the rubric says is worth flagging.
+1. Read the review rubric at: <SKILL_DIR>/references/review-guidelines.md — it tells you what counts as a bug, how to write a comment, and how to acquire the diff. Apply the rubric strictly.
+2. Acquire the diff using the rubric's "Getting the diff" section. Prefer `mcp__conductor__GetWorkspaceDiff` (start with `stat: true`, then pull specific files). If that tool is unavailable, fall back to:
+   - `git diff <BASE_SHA>...HEAD` (committed-but-unmerged)
+   - `git diff HEAD` (working-tree, staged + unstaged)
+   Use the `<BASE_SHA>` value from this prompt directly — the orchestrator has already resolved the base ref. Ignore the rubric's `git merge-base origin/main HEAD` recipe (it's for standalone use).
+3. Only flag what the rubric says is worth flagging. Output every qualifying finding (do not stop at the first one).
 4. For each finding, classify:
    - severity: critical | high | medium | low
    - category: system (runtime crash, broken flow) | security (vuln) | other (quality, perf, maintainability)
-5. Return ONLY a JSON array of findings. Each entry:
+5. **Output format is overridden by this prompt** (the rubric notes this). Return ONLY a JSON array of findings — do NOT post inline `mcp__conductor__DiffComment` comments; the orchestrator merges findings into a single report instead. Each entry:
    {
      "file": "path/to/file",
      "line": "123" or "120-145",
@@ -100,63 +103,108 @@ Steps:
 
 ### 3b. Security review subagent
 
+This subagent delegates to `/security-review`, which is a **built-in slash command shipped inside the Claude Code CLI binary itself** — it is not a plugin and is not separately installable. It is always present when running under Claude Code. The only failure case is the skill running under a non-Claude-Code runtime (Copilot CLI, Gemini CLI, Codex CLI, etc.), where the built-in does not exist.
+
 ```
-description: "Security-focused review"
+description: "Security review (delegates to the built-in /security-review)"
 prompt:
-You are performing a security-only review of the pending git changes in <CWD>.
+You are running a security-only review of the pending git changes in <CWD> by delegating to `/security-review`.
+
+Context for you, the subagent: `/security-review` is a built-in slash command that ships inside the Claude Code CLI binary. It is not a plugin and not separately installable — under Claude Code it is always available. Do NOT instruct the user to install it; if it's missing, the runtime is not Claude Code and there is nothing the user can install to fix that within this skill.
 
 Steps:
-1. Run `git diff <BASE_SHA>...HEAD` and `git diff HEAD`.
-2. Look only for security issues introduced by this change. Use OWASP Top 10 as a checklist:
-   command/SQL/template injection, XSS, SSRF, IDOR, path traversal, broken authn/authz,
-   insecure deserialization, secret leakage, weak/misused crypto, race conditions on auth
-   state, unvalidated redirects, mass assignment, sensitive data in logs.
-3. Skip pre-existing issues that the diff didn't touch.
-4. Return ONLY a JSON array of findings. Same schema as above. Use category="security" for all entries.
-   Severity: critical (exploitable, data exposure, auth bypass), high (clear vuln, exploitation needs preconditions),
-   medium (defense-in-depth gap), low (hardening recommendation).
-   No preamble — just the JSON array (use `[]` if nothing).
+1. Attempt to invoke the `security-review` skill directly via the `Skill` tool with `skill: "security-review"`. Do NOT try to detect availability by parsing system-reminder text — that's brittle. The invocation itself is the probe.
+2. If the invocation succeeds:
+   a. Let it run to completion and capture its full report text.
+   b. Extract its findings into a JSON array using the schema below. Use `category: "security"` for every finding. Map the skill's severity language to: critical (exploitable, data exposure, auth bypass), high (clear vuln, exploitation needs preconditions), medium (defense-in-depth gap), low (hardening recommendation).
+   c. Skip any pre-existing issues the diff didn't introduce.
+   d. Return JSON of the form:
+      {"error": null, "findings": [ ...array of finding objects... ], "raw": "<full skill output verbatim>"}
+3. If the invocation fails (Skill tool unavailable, "skill not found"-style error, or any other error), return:
+   {
+     "error": "security-review not available in this runtime",
+     "runtime_hint": "`/security-review` is a built-in slash command that ships inside the Claude Code CLI binary. It is not separately installable. This error means the triangulated-code-review skill is running under a non-Claude-Code runtime (Copilot CLI, Gemini CLI, Codex CLI, etc.). To use the security reviewer, re-run this skill under Claude Code (https://claude.com/claude-code).",
+     "findings": [],
+     "raw": ""
+   }
+
+Finding schema (same as the comprehensive reviewer):
+{
+  "file": "path/to/file",
+  "line": "123" or "120-145",
+  "severity": "critical|high|medium|low",
+  "category": "security",
+  "title": "short summary, one line",
+  "body": "full explanation with reasoning, scenarios that trigger it, and any suggested fix"
+}
+
+Return ONLY the JSON object — no preamble, no trailing commentary.
 ```
 
 ### 3c. Codex review subagent
 
+This subagent runs the same underlying script that the `/codex:review` slash command runs. (Codex slash commands set `disable-model-invocation: true`, so a subagent cannot invoke them as commands — running the script directly is the supported path and produces identical output.)
+
 ```
-description: "Codex review (foreground)"
+description: "Codex review (runs the /codex:review companion script in foreground)"
 prompt:
-You are running a Codex code review and capturing its full output verbatim.
+You are running the same review that `/codex:review` runs, by invoking its underlying companion script. The `/codex:review` slash command itself sets `disable-model-invocation: true`, so calling the script directly is the supported way to run it from a subagent.
 
 Steps:
-1. Run this exact bash command and capture stdout:
-   node "$HOME/.claude/plugins/marketplaces/openai-codex/plugins/codex/scripts/codex-companion.mjs" review --wait
-2. If the codex-companion script does not exist, return:
-   {"error": "codex plugin not installed", "raw": ""}
-3. On success, return JSON of the form:
+1. Resolve the path to the codex-companion script. Try these locations in order, using the first one that exists:
+   a. `$CLAUDE_PLUGIN_ROOT/scripts/codex-companion.mjs` (if `CLAUDE_PLUGIN_ROOT` is set in the environment)
+   b. The result of `find "$HOME/.claude/plugins" -path '*/codex/scripts/codex-companion.mjs' -print -quit 2>/dev/null`
+   If both lookups come up empty, treat as not-installed and skip to step 3 with the error response.
+2. Run this exact bash command in the foreground using the resolved path (the orchestrator needs the result before it can write the report — do NOT background):
+   node "<resolved-path>" review --wait
+3. If the script could not be located, return:
+   {
+     "error": "codex plugin not installed",
+     "install_hint": "The Codex review delegates to the `codex-companion.mjs` script that ships with the Codex plugin (the same script `/codex:review` runs). Install the Codex plugin from its marketplace (see https://github.com/openai/codex for the current install path) and run `/codex:setup` to authenticate.",
+     "raw": ""
+   }
+4. On success, return JSON of the form:
    {"error": null, "raw": "<full stdout verbatim, do NOT trim or summarize>"}
-4. Do not paraphrase. Do not edit. Do not extract findings — the orchestrator will parse the raw output.
+5. Do not paraphrase. Do not edit. Do not extract findings — the orchestrator will parse the raw output.
 ```
 
 ### 3d. Codex adversarial review subagent
 
+Same delegation pattern as 3c: runs the underlying script for `/codex:adversarial-review`.
+
 ```
-description: "Codex adversarial review (foreground, must wait)"
+description: "Codex adversarial review (runs the /codex:adversarial-review companion script in foreground, must wait)"
 prompt:
-You are running a Codex ADVERSARIAL review (questions design, assumptions, tradeoffs) and capturing its full output verbatim. You MUST wait for the result — do not background it.
+You are running the same adversarial review that `/codex:adversarial-review` runs, by invoking its underlying companion script. (The slash command sets `disable-model-invocation: true`; the script is the supported entry point from a subagent.) The adversarial pass questions design, assumptions, and tradeoffs — not just defects. You MUST wait for the result — do not background it.
 
 Steps:
-1. Run this exact bash command in the foreground and capture stdout:
-   node "$HOME/.claude/plugins/marketplaces/openai-codex/plugins/codex/scripts/codex-companion.mjs" adversarial-review --wait
-2. If the codex-companion script does not exist, return:
-   {"error": "codex plugin not installed", "raw": ""}
-3. On success, return JSON of the form:
+1. Resolve the path to the codex-companion script. Try these locations in order, using the first one that exists:
+   a. `$CLAUDE_PLUGIN_ROOT/scripts/codex-companion.mjs` (if `CLAUDE_PLUGIN_ROOT` is set in the environment)
+   b. The result of `find "$HOME/.claude/plugins" -path '*/codex/scripts/codex-companion.mjs' -print -quit 2>/dev/null`
+   If both lookups come up empty, treat as not-installed and skip to step 3.
+2. Run this exact bash command in the foreground using the resolved path:
+   node "<resolved-path>" adversarial-review --wait
+3. If the script could not be located, return:
+   {
+     "error": "codex plugin not installed",
+     "install_hint": "The adversarial review delegates to the `codex-companion.mjs` script that ships with the Codex plugin (the same script `/codex:adversarial-review` runs). Install the Codex plugin from its marketplace (see https://github.com/openai/codex for the current install path) and run `/codex:setup` to authenticate.",
+     "raw": ""
+   }
+4. On success, return JSON of the form:
    {"error": null, "raw": "<full stdout verbatim>"}
-4. Do not paraphrase or edit.
+5. Do not paraphrase or edit.
 ```
 
 After spawning, wait for **every** subagent to return before moving on. Do not start writing the report from partial results.
 
 ## Step 4: Merge findings
 
-Combine the JSON arrays from the comprehensive and security subagents. The two Codex outputs come back as raw text — keep them as raw blocks; do NOT try to re-parse them into the structured findings list.
+Return shapes by subagent (the hint fields are present **only when `error != null`**):
+- **Comprehensive** — bare JSON array of findings.
+- **Security** — JSON object `{error, runtime_hint?, findings, raw}`. On success, use `findings` (the structured list) and keep `raw` for the audit-trail appendix. On error (`error != null`), the security review is treated as skipped — record the `error` and the verbatim `runtime_hint` in the report's Summary section under "Security review skipped" and skip merging. (`/security-review` is built into the Claude Code CLI, so the error only fires under non-Claude-Code runtimes.)
+- **Codex** and **Codex adversarial** — JSON object `{error, install_hint?, raw}`. On success, keep `raw` for the appendix and (for adversarial) the dedicated section. On error, note "Codex review skipped" in Summary with the verbatim `install_hint` and continue.
+
+Combine the JSON findings arrays from the comprehensive subagent and the security subagent's `findings` (when present). Keep all Codex `raw` outputs as raw text blocks — do NOT try to re-parse them into the structured findings list. The non-adversarial Codex output lives only in the "Raw Reviewer Output" appendix unless you promote individual items inline per the rule below.
 
 ### Conservative dedupe rule
 
@@ -234,7 +282,8 @@ Keep the user-facing message tight — the file is the source of truth.
 
 ## Edge cases & failure modes
 
-- **Codex plugin not installed** — the codex subagents will return `{"error": "codex plugin not installed"}`. Note this in the report's Summary section ("Codex review skipped: plugin not installed") and continue with the other reviewers' results. Do not fail the whole run.
+- **Codex plugin not installed** — the Codex subagents will return `{"error": "codex plugin not installed", "install_hint": "..."}`. Note this in the report's Summary section ("Codex review skipped: plugin not installed") along with the verbatim `install_hint`, and continue with the other reviewers' results. Do not fail the whole run.
+- **security-review not available in this runtime** — `/security-review` is a built-in slash command inside the Claude Code CLI binary; it is not a plugin and not separately installable. The only time the security subagent returns an error is when this skill is running under a non-Claude-Code runtime (Copilot CLI, Gemini CLI, Codex CLI, etc.). The subagent will return `{"error": "security-review not available in this runtime", "runtime_hint": "..."}`. Note this in the Summary section ("Security review skipped: not running under Claude Code") with the verbatim `runtime_hint`, and continue. Do NOT fall back to an inline OWASP pass — the user explicitly delegated to `/security-review` — and do NOT tell the user to install it; there is nothing to install.
 - **A subagent times out or crashes** — record the failure under "Raw Reviewer Output" with an explanatory note, continue with the others.
 - **No findings from anyone** — still write the report file (with empty findings sections) so the user has the audit trail. The summary should clearly say "No issues found." This is a real result, not a no-op.
 - **User runs the skill twice in the same minute** — the seconds in the timestamp prevent collisions. If you somehow get a collision anyway, append `-2` and increment.

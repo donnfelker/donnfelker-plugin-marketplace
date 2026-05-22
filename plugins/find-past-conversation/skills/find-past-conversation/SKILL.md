@@ -1,6 +1,6 @@
 ---
 name: find-past-conversation
-description: "Searches past Claude Code session transcripts to find a previous conversation the user recalls having. Use when the user says 'search your history for', 'find the conversation about', 'look through your past sessions', 'did I ever finish that work on', 'what did we decide about X last week', or otherwise asks you to recall a prior session. Returns the session ID, project, date, and a short summary; if asked, also reports the outcome (whether code was committed, a branch was pushed, a PR was opened or merged). For addressing comments on the current PR, see address-pr-comments. For analyzing the current codebase, see codebase-analyzer."
+description: "Searches past Claude Code session transcripts under ~/.claude/projects/ to recover a previous conversation by recalled phrase, error string, or topic. Use when the user says 'search your history for', 'find the conversation about', 'look through your past sessions', 'did I ever finish that work on', 'what did we decide about X last week', 'remind me what came out of that session', or otherwise asks you to recall a prior session. Returns session ID, project, date, and a 2-4 sentence summary; on request, also reports the outcome (commit, branch, PR opened or merged). Not for searching the current codebase, current PR comments, or external systems like Slack/Jira — for those, see codebase-analyzer and address-pr-comments."
 license: MIT
 ---
 
@@ -81,10 +81,17 @@ rg -l -i "<distinctive phrase>" ~/.claude/projects/<project>/*.jsonl
 
 If the user only has a generic word, **ask them for a distinctive phrase** before searching: an error string, a function name, a flag, a file path, a UI label, a person's name. One specific phrase beats five generic ones.
 
-Add `--glob '!subagents'` to skip the noisy subagent transcripts unless the user specifically wants them:
+Subagent transcripts live one level deeper (`<project>/<session-id>/subagents/agent-*.jsonl`), so a top-level shell glob like `~/.claude/projects/<project>/*.jsonl` skips them automatically — no extra flag needed for the targeted case:
 
 ```bash
-rg -l -i --glob '!subagents' "your phrase" ~/.claude/projects/<project>/*.jsonl
+rg -l -i "your phrase" ~/.claude/projects/<project>/*.jsonl
+```
+
+If you instead recurse with ripgrep across everything (e.g. when you don't know the project), exclude the subagent subtree explicitly — otherwise you'll get duplicate hits:
+
+```bash
+rg -l -i "your phrase" ~/.claude/projects \
+   --glob '*.jsonl' --glob '!**/subagents/**'
 ```
 
 ### Step 3 — Triage the candidate list
@@ -150,9 +157,9 @@ Report back: open / merged / closed, current review decision, and whether CI was
 - **Don't `cat` whole `.jsonl` files.** They are huge and contain `signature` blocks, base64 thinking traces, and tool-result payloads. Use `rg` first to find the matching lines, then `jq` or `grep -B/-A` to pull a window.
 - **Don't grep for common words without a qualifier.** `approve`, `error`, `fix`, `commit`, `pr` will hit every session. Anchor on something distinctive the user remembers.
 - **Don't trust the first match.** Sessions can run for hours; the canonical decision is often in a later turn. Scan the timestamps and prefer matches near the *end* of a session over the *start*.
-- **Don't auto-include subagent transcripts.** They duplicate the parent session's content from a different angle and multiply hits. Skip with `--glob '!subagents'` unless the user asks.
+- **Don't auto-include subagent transcripts.** They duplicate the parent session's content from a different angle and multiply hits. When recursing, exclude with `--glob '!**/subagents/**'`; with a top-level shell glob they're already skipped.
 - **Don't paraphrase from memory.** If you're reporting what was discussed, ground every claim in an actual line you extracted from the file — model memory of past sessions is unreliable.
-- **Don't search across `/Users/dfelker/.claude/projects/*` when the user has clearly named the repo.** Narrow first.
+- **Don't search across `~/.claude/projects/*` when the user has clearly named the repo.** Narrow first.
 
 ## Failure modes and recovery
 
@@ -165,15 +172,17 @@ Report back: open / merged / closed, current review decision, and whether CI was
 User says: *"Find the conversation we had about the bot auto-approving a PR when it finds approvals."*
 
 ```bash
-# Step 1: across all projects since user didn't name a repo
-rg -l -i "auto.approv" ~/.claude/projects/*/[0-9a-f]*.jsonl --glob '!subagents'
+# Step 1: across all projects since user didn't name a repo.
+# The shell glob `*/[0-9a-f]*.jsonl` only matches top-level session files,
+# so subagent transcripts (one dir deeper) are naturally excluded.
+rg -l -i "auto.approv" ~/.claude/projects/*/[0-9a-f]*.jsonl
 # → too many hits; mostly `terraform apply -auto-approve`. Ask for a distinctive phrase.
 
 # User: "look for 'request changes'"
-rg -l -i "request changes" ~/.claude/projects/*/[0-9a-f]*.jsonl --glob '!subagents'
+rg -l -i "request changes" ~/.claude/projects/*/[0-9a-f]*.jsonl
 # → narrows to ~10 files. Sort by recency.
 
-ls -lt $(rg -l -i "request changes" ~/.claude/projects/*/[0-9a-f]*.jsonl --glob '!subagents') | head -5
+ls -lt $(rg -l -i "request changes" ~/.claude/projects/*/[0-9a-f]*.jsonl) | head -5
 
 # Step 4: read context from the most recent candidate
 rg -i -B 2 -A 5 "request changes" \

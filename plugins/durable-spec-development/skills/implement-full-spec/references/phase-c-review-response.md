@@ -348,4 +348,4 @@ A sweep with zero new actionable items is your termination condition. Tell the o
 
 - `gotchas.md` — three-source fetch trap, jq control chars, rebase --onto pattern, force-push-with-lease semantics, evolving-API conflict patterns
 - `prompt-templates.md` — Phase C agent skeleton when you delegate the per-PR work
-- The `address-pr-comments` skill (plugin: `address-pr-comments:address-pr-comments`) is the single-PR version of this phase. If the operator only has one PR to handle, that skill is the better fit — it covers fetch → plan → fix → reply → resolve for a single PR without the cascade-rebase machinery. Use it directly rather than invoking this whole skill for one PR.
+- The `address-pr-comments` skill (plugin: `durable-spec-development:address-pr-comments`) is the single-PR version of this phase. If the operator only has one PR to handle, that skill is the better fit — it covers fetch → plan → fix → reply → resolve for a single PR without the cascade-rebase machinery. Use it directly rather than invoking this whole skill for one PR.

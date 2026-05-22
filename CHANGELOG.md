@@ -10,17 +10,18 @@ Current versions of all plugins. Compare against local versions to check for upd
 | generate-release-notes | 1.0.0 | 2026-03-02 |
 | pr-title | 1.0.0 | 2026-03-11 |
 | triangulated-code-review | 1.1.0 | 2026-05-22 |
-| address-pr-comments | 0.1.0 | 2026-04-30 |
-| durable-spec-development | 1.0.0 | 2026-05-21 |
+| durable-spec-development | 1.1.0 | 2026-05-22 |
 | find-past-conversation | 1.0.0 | 2026-05-22 |
 
 ## Recent Changes
 
 ### 2026-05-22
 - Renamed `code-review` plugin to `triangulated-code-review` (v1.0.0 → v1.1.0). Borrows from research methodology, where you check a finding against multiple independent sources to reduce blind spots. Updates the plugin directory, skill name, manifest, description, and the report filename prefix (`triangulated-code-review-<timestamp>.md`).
+- Folded the standalone `address-pr-comments` plugin into `durable-spec-development` as a third bundled skill, bumping the plugin to v1.1.0. The skill itself is unchanged; the standalone plugin entry was removed from the marketplace because the durable-spec workflow already owns the per-PR review-response phase and the two were being installed together in practice.
 - Added `find-past-conversation` plugin: searches past Claude Code session transcripts under `~/.claude/projects/` to locate a previous conversation by recalled keyword or phrase. Reports session ID, project, date, and a short summary; on request, parses the transcript for commits, pushes, and PR URLs and reports the current PR state via `gh`. Includes guidance on JSON-aware extraction with `jq`, search-string hygiene, and skipping noisy subagent transcripts by default.
 
 ### 2026-05-21
+- Fleshed out `durable-spec-development/plan-to-tickets` Linear reference (`references/linear.md`): replaced the stub with concrete OAuth setup, MCP tool inventory, unified `save_issue` create/update semantics, `blockedBy` direction, project-icon validation footgun, and the `list_issues` output-cap workaround — validated across a multi-phase Linear import.
 - Added `durable-spec-development` plugin bundling two skills for the durable spec lifecycle:
   - `plan-to-tickets` — imports a structured planning document into ClickUp / Linear / Jira / Asana / Notion / GitHub Projects (or a markdown fallback) as a ticket hierarchy with dependencies wired. Migrated from the standalone `plan-to-tickets` plugin.
   - `implement-full-spec` — turns a parent ticket with N actionable subtasks into N stacked pull requests, then drives the stack to merge-ready by addressing every bot and human review comment and cascading rebases across the stack.

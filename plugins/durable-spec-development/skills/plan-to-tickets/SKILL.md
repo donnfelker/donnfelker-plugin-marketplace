@@ -178,7 +178,7 @@ Count the tickets created (one per ticket creation API call) and compare to expe
 When working with a specific tracker, read the corresponding reference file:
 
 - ClickUp → `references/clickup.md` (filled in)
-- Linear → `references/linear.md` (stub — has the checklist of what to capture on first Linear job)
+- Linear → `references/linear.md` (filled in)
 - Jira → `references/jira.md` (stub)
 - Asana → `references/asana.md` (stub)
 - Notion → `references/notion.md` (stub)

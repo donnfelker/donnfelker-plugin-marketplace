@@ -27,19 +27,19 @@ Do **not** use this for searching the current codebase, the current PR's comment
 
 ```
 ~/.claude/projects/
-├── -Users-dfelker-source-polygon-geo/
+├── -Users-alice-source-acme-api/
 │   ├── 06c5c59e-0735-...jsonl          # one session = one file
 │   ├── a7e955d8-cf10-...jsonl
 │   └── a7e955d8-cf10-.../
 │       └── subagents/
 │           └── agent-ab42fde6...jsonl  # subagent transcripts
-├── -Users-dfelker-source-polygon-background-agents/
+├── -Users-alice-source-acme-worker/
 └── ...
 ```
 
 Important facts:
 
-- **The project folder is the working directory with `/` replaced by `-`.** So a session run in `/Users/dfelker/source/polygon/geo` lives under `~/.claude/projects/-Users-dfelker-source-polygon-geo/`.
+- **The project folder is the working directory with `/` replaced by `-`.** So a session run in `/Users/alice/source/acme/api` lives under `~/.claude/projects/-Users-alice-source-acme-api/`.
 - **The session ID is the filename without `.jsonl`** — e.g. `a7e955d8-cf10-42ec-a36b-0fe2bcb42d45`.
 - **Each line in the `.jsonl` is a single JSON message** with a `type` field (`user`, `assistant`, `system`, etc.), a `timestamp`, and content. Lines are not pretty-printed and can be tens of KB each.
 - **Subagent transcripts live in `<session-id>/subagents/agent-*.jsonl`.** They're noisy and multiply hits without adding much. Skip them by default.
@@ -162,7 +162,7 @@ Report back: open / merged / closed, current review decision, and whether CI was
 
 ## Worked example
 
-User says: *"Find the conversation we had about background agents auto-approving a PR when they find approvals."*
+User says: *"Find the conversation we had about the bot auto-approving a PR when it finds approvals."*
 
 ```bash
 # Step 1: across all projects since user didn't name a repo
@@ -176,16 +176,18 @@ rg -l -i "request changes" ~/.claude/projects/*/[0-9a-f]*.jsonl --glob '!subagen
 ls -lt $(rg -l -i "request changes" ~/.claude/projects/*/[0-9a-f]*.jsonl --glob '!subagents') | head -5
 
 # Step 4: read context from the most recent candidate
-rg -i -B 2 -A 5 "request changes" ~/.claude/projects/-Users-dfelker-source-polygon-geo/a7e955d8-*.jsonl | head -60
+rg -i -B 2 -A 5 "request changes" \
+   ~/.claude/projects/-Users-alice-source-acme-api/a7e955d8-*.jsonl | head -60
 
-# Step 5: report — Session a7e955d8-... in polygon-geo, 2026-05-14, about the github-bot
+# Step 5: report — Session a7e955d8-... in acme-api, 2026-05-14, about the review bot
 #   posting a plain comment after a REQUEST_CHANGES review (which doesn't clear the
 #   block) instead of submitting a new opinionated review.
 
 # Outcome check
-rg -o 'https://github.com/[^"]*pull/[0-9]+' ~/.claude/projects/-Users-dfelker-source-polygon-geo/a7e955d8-*.jsonl | sort -u
-# → https://github.com/0xPolygon/geo/pull/23
-gh pr view 23 --repo 0xPolygon/geo --json state,mergedAt,reviewDecision
+rg -o 'https://github.com/[^"]*pull/[0-9]+' \
+   ~/.claude/projects/-Users-alice-source-acme-api/a7e955d8-*.jsonl | sort -u
+# → https://github.com/acme/api/pull/23
+gh pr view 23 --repo acme/api --json state,mergedAt,reviewDecision
 # → OPEN, APPROVED, not yet merged
 ```
 

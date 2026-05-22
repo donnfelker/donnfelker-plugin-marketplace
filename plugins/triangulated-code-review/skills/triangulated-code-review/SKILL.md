@@ -1,17 +1,17 @@
 ---
-name: code-review
-description: "Multi-reviewer code-review orchestrator that runs a comprehensive review, a security review, a Codex review, and a Codex adversarial review in parallel, then merges and prioritizes their findings into one timestamped report. Use whenever the user asks for 'a thorough code review,' 'review my changes,' 'multi-reviewer review,' 'run all the reviews,' 'code review with security,' 'pre-PR review,' wants more than a single perspective on pending changes, or invokes the code-review orchestrator. Prefer this over a single reviewer whenever the user wants real coverage before opening a PR."
+name: triangulated-code-review
+description: "Triangulated multi-reviewer code-review orchestrator that runs a comprehensive review, a security review, a Codex review, and a Codex adversarial review in parallel, then merges and prioritizes their findings into one timestamped report. Borrows from research methodology: triangulating a finding against multiple independent reviewers reduces blind spots. Use whenever the user asks for 'a thorough code review,' 'triangulated review,' 'review my changes,' 'multi-reviewer review,' 'run all the reviews,' 'code review with security,' 'pre-PR review,' wants more than a single perspective on pending changes, or invokes the triangulated-code-review orchestrator. Prefer this over a single reviewer whenever the user wants real coverage before opening a PR."
 ---
 
-# Code Review Orchestrator
+# Triangulated Code Review Orchestrator
 
-You are the **review lead**. Your job is to coordinate up to four specialized reviewers in parallel, merge their findings into one prioritized report, and save that report to disk so the user (and future-you) can refer back to it.
+You are the **review lead**. Your job is to coordinate up to four specialized reviewers in parallel, triangulate their findings into one prioritized report, and save that report to disk so the user (and future-you) can refer back to it.
 
-**Announce at start:** "I'm using the code-review orchestrator skill — let me confirm which reviewers to run."
+**Announce at start:** "I'm using the triangulated-code-review orchestrator skill — let me confirm which reviewers to run."
 
 ## Why this skill exists
 
-Single-reviewer passes miss things. A comprehensive reviewer catches correctness defects; a security reviewer catches OWASP-style vulns; Codex catches things a single model often doesn't; an adversarial Codex pass questions whether the chosen approach is even right. Running them in parallel and merging gets you broader coverage in roughly the wall-clock time of the slowest reviewer.
+Single-reviewer passes miss things. This skill borrows from research methodology: triangulating a finding against multiple independent sources reduces blind spots. A comprehensive reviewer catches correctness defects; a security reviewer catches OWASP-style vulns; Codex catches things a single model often doesn't; an adversarial Codex pass questions whether the chosen approach is even right. Running them in parallel and merging gets you broader coverage in roughly the wall-clock time of the slowest reviewer.
 
 The merged report is saved to a timestamped file so you can re-run later and `diff` against the previous report to see what changed.
 
@@ -65,7 +65,7 @@ Use `subagent_type: "general-purpose"` for all four. Each subagent's prompt belo
 
 Required substitutions:
 - `<CWD>` → absolute path of the current working directory (e.g. `/Users/foo/code/myrepo`)
-- `<SKILL_DIR>` → absolute path of this skill's directory. Resolve this from the orchestrator's runtime: it is the directory containing the SKILL.md you are reading. If unsure, run `find ~/.claude/plugins -path '*code-review/skills/code-review/SKILL.md' -print -quit` and use its parent.
+- `<SKILL_DIR>` → absolute path of this skill's directory. Resolve this from the orchestrator's runtime: it is the directory containing the SKILL.md you are reading. If unsure, run `find ~/.claude/plugins -path '*triangulated-code-review/skills/triangulated-code-review/SKILL.md' -print -quit` and use its parent.
 - `<BASE_SHA>` → the resolved base SHA from Step 1
 - `<HEAD_SHA>` → output of `git rev-parse HEAD`
 
@@ -185,7 +185,7 @@ The non-adversarial Codex review's raw output goes into a "Raw Reviewer Output" 
 Compute a filename in the **current working directory**:
 
 ```
-code-review-<YYYY-MM-DD-HHMMSS>.md
+triangulated-code-review-<YYYY-MM-DD-HHMMSS>.md
 ```
 
 Use `date +%Y-%m-%d-%H%M%S` for the timestamp (local time is fine; just be consistent).
@@ -193,9 +193,9 @@ Use `date +%Y-%m-%d-%H%M%S` for the timestamp (local time is fine; just be consi
 The file MUST start with this exact header (substitute placeholders):
 
 ```markdown
-# Code Review Report
+# Triangulated Code Review Report
 
-> **Created by:** code-review skill (donnfelker-plugins → code-review plugin)
+> **Created by:** triangulated-code-review skill (donnfelker-plugins → triangulated-code-review plugin)
 > **Created At:** <ISO 8601 datetime, e.g. 2026-04-25T14:32:11-05:00>
 > **Working Directory:** <absolute CWD>
 > **Git Base:** <resolved base ref> (`<base SHA>`)
@@ -226,7 +226,7 @@ After writing the file, in your text response to the user:
 1. State the absolute file path written.
 2. Show the summary counts (severity × category, plus adversarial concerns yes/no).
 3. List the top 3–5 most severe findings inline (just `[SEV][CAT] file:line — title`).
-4. If a previous `code-review-*.md` exists in CWD, mention it and suggest:
+4. If a previous `triangulated-code-review-*.md` exists in CWD, mention it and suggest:
    `diff <previous> <new>` to see what changed.
 5. Remind the user: the full detail is in the report file — they can re-open it any time.
 

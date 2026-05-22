@@ -9,11 +9,14 @@ Current versions of all plugins. Compare against local versions to check for upd
 | git-worktree | 1.0.0 | 2026-02-27 |
 | generate-release-notes | 1.0.0 | 2026-03-02 |
 | pr-title | 1.0.0 | 2026-03-11 |
-| code-review | 1.0.0 | 2026-04-25 |
+| triangulated-code-review | 1.1.0 | 2026-05-22 |
 | address-pr-comments | 0.1.0 | 2026-04-30 |
 | durable-spec-development | 1.0.0 | 2026-05-21 |
 
 ## Recent Changes
+
+### 2026-05-22
+- Renamed `code-review` plugin to `triangulated-code-review` (v1.0.0 → v1.1.0). Borrows from research methodology, where you check a finding against multiple independent sources to reduce blind spots. Updates the plugin directory, skill name, manifest, description, and the report filename prefix (`triangulated-code-review-<timestamp>.md`).
 
 ### 2026-05-21
 - Added `durable-spec-development` plugin bundling two skills for the durable spec lifecycle:

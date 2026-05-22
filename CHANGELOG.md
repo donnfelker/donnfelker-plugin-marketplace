@@ -10,10 +10,12 @@ Current versions of all plugins. Compare against local versions to check for upd
 | generate-release-notes | 1.0.0 | 2026-03-02 |
 | pr-title | 1.0.0 | 2026-03-11 |
 | code-review | 1.0.0 | 2026-04-25 |
-| address-pr-comments | 0.1.0 | 2026-04-30 |
-| durable-spec-development | 1.0.0 | 2026-05-21 |
+| durable-spec-development | 1.1.0 | 2026-05-22 |
 
 ## Recent Changes
+
+### 2026-05-22
+- Folded the standalone `address-pr-comments` plugin into `durable-spec-development` as a third bundled skill, bumping the plugin to v1.1.0. The skill itself is unchanged; the standalone plugin entry was removed from the marketplace because the durable-spec workflow already owns the per-PR review-response phase and the two were being installed together in practice.
 
 ### 2026-05-21
 - Added `durable-spec-development` plugin bundling two skills for the durable spec lifecycle:

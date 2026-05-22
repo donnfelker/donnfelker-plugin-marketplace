@@ -23,8 +23,7 @@ Plugins are packages of skills, commands, agents, and hooks that extend Claude C
 | [generate-release-notes](plugins/generate-release-notes/) | Generates release notes and changelogs from [Conventional Commits](https://www.conventionalcommits.org/) parsed from git log history |
 | [pr-title](plugins/pr-title/) | Generates PR titles following the [Conventional Commits v1.0.0](https://www.conventionalcommits.org/) specification |
 | [code-review](plugins/code-review/) | Multi-reviewer code review orchestrator. Runs a comprehensive review, security review, codex review, and codex adversarial review in parallel and combines their findings into one prioritized, timestamped report |
-| [address-pr-comments](plugins/address-pr-comments/) | Reviews and addresses unresolved GitHub PR comments on the current branch. Fetches comments, classifies actionable items, plans changes, applies them after approval, then replies with the commit reference and resolves threads |
-| [durable-spec-development](plugins/durable-spec-development/) | End-to-end durable spec workflow. Bundles `plan-to-tickets` (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown) and `implement-full-spec` (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review) |
+| [durable-spec-development](plugins/durable-spec-development/) | End-to-end durable spec workflow. Bundles `plan-to-tickets` (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown), `implement-full-spec` (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review), and `address-pr-comments` (review and address unresolved GitHub PR comments on the current branch) |
 <!-- PLUGINS:END -->
 
 ## Installation

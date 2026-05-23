@@ -10,12 +10,13 @@ Current versions of all plugins. Compare against local versions to check for upd
 | generate-release-notes | 1.0.0 | 2026-03-02 |
 | pr-title | 1.0.0 | 2026-03-11 |
 | triangulated-code-review | 1.2.1 | 2026-05-22 |
-| durable-spec-development | 1.1.0 | 2026-05-22 |
+| durable-spec-development | 1.2.0 | 2026-05-22 |
 | find-past-conversation | 1.0.0 | 2026-05-22 |
 
 ## Recent Changes
 
 ### 2026-05-22
+- Bumped `durable-spec-development` to v1.2.0: extended the `address-pr-comments` skill with a post-push "Request re-review from bots" step. The skill now @-mentions bots with the required `[bot]` suffix (`@review-bot[bot]`, not `@review-bot` — without the suffix the mention silently resolves to the wrong account and the bot is never notified), only pings bots whose feedback was actually addressed in the round, and can combine the "Addressed in <commit>" reply and the re-review ping into one comment on the same thread.
 - Bumped `triangulated-code-review` to v1.2.1: corrected the security reviewer's framing — `/security-review` is a **built-in slash command in the Claude Code CLI binary**, not a plugin. The fallback message no longer tells the user to install anything; it explains the only failure mode (running this skill under a non-Claude-Code runtime like Copilot CLI, Gemini CLI, or Codex CLI) and the error field renamed from `install_hint` to `runtime_hint`. Step 4 and Edge Cases updated to match.
 - Bumped `triangulated-code-review` to v1.2.0: the security reviewer now delegates to `/security-review` via the `Skill` tool, and the two Codex reviewers reframe their bash invocation as "running the same companion script `/codex:review` and `/codex:adversarial-review` run" — including a robust `$CLAUDE_PLUGIN_ROOT` → `find` path-resolution probe and softer install hints. The comprehensive reviewer's rubric (`references/review-guidelines.md`) was rewritten to add a "Getting the diff" section (prefer `mcp__conductor__GetWorkspaceDiff`, fall back to git) and a clearly-fenced "Standalone use only" output-format section so subagents in the orchestrator path don't get confused.
 - Renamed `code-review` plugin to `triangulated-code-review` (v1.0.0 → v1.1.0). Borrows from research methodology, where you check a finding against multiple independent sources to reduce blind spots. Updates the plugin directory, skill name, manifest, description, and the report filename prefix (`triangulated-code-review-<timestamp>.md`).

@@ -176,6 +176,30 @@ gh pr comment {number} --body 'Addressed [this comment](comment-url) in [`abcdef
 
 Include a link back to the original comment so the reply has clear context.
 
+### Request re-review from bots
+
+After commits have been pushed and replies are posted, ask each automated reviewer to re-review — but **only the bots whose comments you actually addressed in this round**. Don't ping a bot whose feedback you skipped or that wasn't involved in the changes you just pushed; that creates noise and trains reviewers to ignore your pings.
+
+Post the re-review request as a follow-up reply on the same thread where the bot left its comment (or as a top-level PR comment if the bot's review was a top-level review).
+
+**Mention format — this is the part that's easy to get wrong:**
+
+GitHub names bot accounts with a `[bot]` suffix by default (e.g., `review-bot[bot]`, `github-actions[bot]`). To @-mention them in a comment, you **must include the `[bot]` suffix**, otherwise the mention won't resolve to the bot account and the bot won't be notified.
+
+- **Bad:** `@review-bot please review again` — this @-mentions a non-existent user account or the wrong account, and the bot will not be triggered.
+- **Good:** `@review-bot[bot] please review again` — this resolves to the bot account.
+
+The only exception is if you have direct evidence that a specific bot accepts mentions **without** the `[bot]` suffix. For example, Claude's GitHub app responds to both `@claude` and `@claude[bot]` — either works. Some self-hosted or custom integrations behave the same way. Default to `[bot]` unless you know otherwise — check the `user.login` field from the API response you fetched in Phase 1 and use that exact string. If `user.login` is `review-bot[bot]`, mention it as `@review-bot[bot]`.
+
+**Example re-review request:**
+
+```bash
+gh api repos/{owner}/{repo}/pulls/{number}/comments/{comment_id}/replies \
+  -f body='@review-bot[bot] please review again — addressed in [`abcdef0`](https://github.com/owner/repo/commit/abcdef0123456789)'
+```
+
+You can combine the "Addressed in <commit>" reply and the re-review ping into a single comment, as shown above, rather than posting two separate replies on the same thread.
+
 ### After all replies are posted
 
-Tell the user which comments were replied to and provide the PR URL so they can verify.
+Tell the user which comments were replied to, which bots (if any) were asked to re-review, and provide the PR URL so they can verify.

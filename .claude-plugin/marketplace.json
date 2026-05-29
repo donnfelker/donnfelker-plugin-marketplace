@@ -48,6 +48,11 @@
       "name": "find-past-conversation",
       "source": "./plugins/find-past-conversation",
       "description": "Searches past Claude Code session transcripts to find a previous conversation by recalled keyword or phrase, then optionally reports the outcome (commit, branch, PR opened, merged)."
+    },
+    {
+      "name": "skill-scout",
+      "source": "./plugins/skill-scout",
+      "description": "Scouts an agent conversation (current or a past saved transcript) for skill opportunities and produces a markdown report of recommended new skills, edits to existing ones, and content to simplify, then hands off to /skill-creator or edits the affected SKILL.md directly."
     }
   ]
 }

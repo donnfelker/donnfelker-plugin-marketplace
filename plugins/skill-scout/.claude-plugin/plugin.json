@@ -1,0 +1,9 @@
+{
+  "name": "skill-scout",
+  "version": "1.0.0",
+  "description": "Scouts an agent conversation (current or a past saved transcript) for skill opportunities and produces a markdown report of recommended new skills, edits to existing ones, and content to simplify, then hands off to /skill-creator or edits the affected SKILL.md directly.",
+  "author": {
+    "name": "Donn Felker",
+    "email": "donnfelker@gmail.com"
+  }
+}

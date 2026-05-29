@@ -12,8 +12,12 @@ Current versions of all plugins. Compare against local versions to check for upd
 | triangulated-code-review | 1.3.0 | 2026-05-22 |
 | durable-spec-development | 1.2.0 | 2026-05-22 |
 | find-past-conversation | 1.0.0 | 2026-05-22 |
+| skill-scout | 1.0.0 | 2026-05-29 |
 
 ## Recent Changes
+
+### 2026-05-29
+- Added `skill-scout` plugin: scouts an agent conversation — the current session by default, or a past `.jsonl` transcript under `~/.claude/projects/` when asked — for skill opportunities and produces a `# Skill Scout Report` in chat. Detects five signals (manual workflows worth packaging, existing-skill output that had to be corrected, repeated user corrections, reusable multi-step research, and skill content to simplify or remove), inventories existing skills across repo-local / user / cache / mounted sources and tracks each skill's origin so edits route to the right place (direct Edit for editable sources, print-and-hand-off for read-only caches and mounts), then hands off to `/skill-creator` for new skills or edits the affected SKILL.md directly. Generalized from an internal version — no company-specific marketplace assumptions.
 
 ### 2026-05-22
 - Bumped `durable-spec-development` to v1.2.0: extended the `address-pr-comments` skill with a post-push "Request re-review from bots" step. The skill now @-mentions bots with the required `[bot]` suffix (`@review-bot[bot]`, not `@review-bot` — without the suffix the mention silently resolves to the wrong account and the bot is never notified), only pings bots whose feedback was actually addressed in the round, and can combine the "Addressed in <commit>" reply and the re-review ping into one comment on the same thread.

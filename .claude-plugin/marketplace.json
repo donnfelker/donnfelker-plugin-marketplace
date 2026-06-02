@@ -10,11 +10,6 @@
   },
   "plugins": [
     {
-      "name": "git-worktree",
-      "source": "./plugins/git-worktree",
-      "description": "Manages git worktrees including listing, creating, removing, and switching between worktrees with consistent naming conventions"
-    },
-    {
       "name": "codebase-analyzer",
       "source": "./plugins/codebase-analyzer",
       "description": "Comprehensive multi-phase codebase technical analysis. Analyzes architecture, code quality, testing, infrastructure, and generates a detailed engineering report."

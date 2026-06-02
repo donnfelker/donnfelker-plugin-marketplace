@@ -144,6 +144,7 @@ If a documented step is producing pain instead of value, change it and write the
 
 ## Pointers
 
+- `${CLAUDE_PLUGIN_ROOT}/references/pr-review-mechanics.md` — the plugin-wide, single-PR review mechanics (three-source fetch, classify, reply/resolve, per-bot re-review triggers) shared with `address-pr-comments` and `pr-autopilot`. Phase C is the stacked-PR superset of this: apply the shared mechanics per PR, then layer the cascade-rebase + per-round re-review in `references/phase-c-review-response.md` on top.
 - `references/phase-a-plan.md` — survey the parent, filter, design the stack, present the plan
 - `references/phase-b-execute-subtask.md` — the per-subtask Dev → QA → Reviewer loop in mechanical detail
 - `references/phase-c-review-response.md` — three-source fetch + classify + fix + reply + cascade-rebase + re-review ping

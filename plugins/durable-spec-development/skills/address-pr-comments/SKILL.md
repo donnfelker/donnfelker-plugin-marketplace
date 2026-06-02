@@ -11,74 +11,40 @@ user_invocable: true
 
 # Address PR Comments
 
-Systematically review, plan, and resolve unresolved pull request comments on the current branch.
+Systematically review, plan, and resolve unresolved pull request comments on the current branch — in
+**one interactive pass**, with you in control of when to edit and when to commit.
 
-## Phase 1: Discover the PR and Its Comments
+This skill owns the *control flow* (discover → plan → get approval → address → let you review → reply
+and resolve). The *mechanics* — how to fetch all three comment sources, classify them, reply, resolve
+threads, and re-request the right reviewers — live in a shared reference so they stay consistent with
+the other PR skills in this plugin:
 
-### Get the PR
+**Read `${CLAUDE_PLUGIN_ROOT}/references/pr-review-mechanics.md` first** (if that path doesn't
+resolve, it's at the plugin root, two levels up from this skill:
+`../../references/pr-review-mechanics.md`). The phases below tell you *when* to apply each section of
+it; that file tells you *how*.
 
-```bash
-gh pr view --json number,url,headRefName,baseRefName
-```
+If you want a hands-off version that loops across multiple review rounds — committing, pushing, and
+re-requesting review on its own until the reviews settle — use `pr-autopilot` instead. This skill
+is the single-pass, ask-first counterpart.
 
-If this fails, the current branch has no open PR. Tell the user and stop.
+## Phase 1: Discover the PR and its comments
 
-### Fetch PR review comments
+Apply **§1 (Discover the PR)** and **§2 (Fetch all three comment sources)** of the mechanics
+reference. If there's no open PR for the current branch, tell the user and stop.
 
-Get all review comments (inline code comments from reviews):
+Then apply **§3 (Determine what is unaddressed)** to narrow down to the threads and comments that
+still need attention.
 
-```bash
-gh pr view --json reviews,reviewThreads
-```
+## Phase 2: Classify and filter
 
-If `reviewThreads` is not available, fall back to:
+Apply **§4 (Classify: actionable vs. not)**. Skip the not-actionable items.
 
-```bash
-gh pr view --json comments,reviews
-```
+When a comment is ambiguous — it might be actionable but you're not sure — include it in the plan
+marked "needs clarification" so the user can decide. (That's this skill's interactive answer to the
+ambiguity question the reference leaves to the caller.)
 
-Also fetch inline review comments via:
-
-```bash
-gh api repos/{owner}/{repo}/pulls/{number}/comments
-```
-
-This returns all inline review comments with `path`, `line`, `body`, `user.login`, `html_url`, `id`, and `in_reply_to_id`. Comments with `in_reply_to_id` are replies in a thread — group them by that field.
-
-### Fetch general PR conversation comments
-
-These are top-level comments on the PR (not inline code review comments):
-
-```bash
-gh pr view --json comments --jq '.comments'
-```
-
-### Determine which comments are unresolved
-
-Use the `gh pr view` output to identify unresolved threads. If the CLI output includes thread resolution status, use that. Otherwise, treat any inline review comment thread that has no reply containing "Addressed" as unresolved.
-
-For general PR comments, treat them as unresolved unless there is a reply indicating the comment was addressed.
-
-## Phase 2: Classify and Filter
-
-Not every comment needs a code change. Read each comment and classify it:
-
-**Actionable — address these:**
-- Requests for a specific code change ("use a constant here", "add null check", "rename this")
-- Bug reports or logic issues ("this will fail when X is null", "off-by-one error")
-- Style or formatting requests ("add trailing comma", "rename variable to camelCase")
-- Suggestions from automated tools (CodeRabbit, Claude Code Review) that request concrete changes
-
-**Not actionable — skip these:**
-- Praise or acknowledgment ("Nice!", "LGTM", "Good catch")
-- Open-ended questions ("Why did you choose this approach?")
-- Discussions or opinions without a clear ask ("We might want to consider...")
-- Informational comments ("FYI, this module was refactored last week")
-- Summary comments from bots (CodeRabbit walkthrough, review summary headers)
-
-When a comment is ambiguous — it might be actionable but you're not sure — include it in the plan marked as "needs clarification" so the user can decide.
-
-## Phase 3: Present the Plan
+## Phase 3: Present the plan
 
 Show the user a numbered list. For each actionable comment include:
 
@@ -110,96 +76,38 @@ Example format:
 
 Then ask: **"Does this plan look right? Should I proceed, adjust anything, or skip any items?"**
 
-Wait for explicit approval before making changes.
+Wait for explicit approval before making changes. This gate is the point of this skill — don't skip
+it. (The autonomous `pr-autopilot` skill is the one that proceeds without asking.)
 
-## Phase 4: Address the Comments
+## Phase 4: Address the comments
 
 Work through each approved item:
 
-1. Read the relevant file and understand the surrounding context
-2. Make the change as described in the plan
-3. After all changes, run the project's linter/formatter if applicable (e.g., `flutter analyze` + `dart format .` for Flutter projects, or whatever the project uses)
-4. Track which comment maps to which file change
+1. Read the relevant file and understand the surrounding context.
+2. Make the change as described in the plan.
+3. After all changes, run the project's linter/formatter if applicable (e.g. `flutter analyze` +
+   `dart format .` for Flutter, or whatever the project uses).
+4. Track which comment maps to which file change.
 
-Group related comments that touch the same file or function — address them together in one pass rather than repeatedly re-reading the same code.
+Group related comments that touch the same file or function — address them together in one pass
+rather than repeatedly re-reading the same code.
 
-## Phase 5: User Review
+## Phase 5: User review
 
 After all changes are complete:
 
-1. Summarize what was changed, mapping each plan item to the actual change made
-2. Let the user review the diff
-3. Do NOT commit automatically — the user decides when to commit
-4. When the user commits (or asks you to commit), capture the commit hash
+1. Summarize what changed, mapping each plan item to the actual change made.
+2. Let the user review the diff.
+3. **Do NOT commit automatically** — the user decides when to commit.
+4. When the user commits (or asks you to commit), capture the commit hash.
 
-## Phase 6: Reply and Resolve on GitHub
+## Phase 6: Reply, resolve, and re-request
 
-After the commit exists, reply to each addressed comment and resolve the thread.
-
-### Reply format
-
-```
-Addressed in [`<short-hash>`](<commit-url>)
-```
-
-Where `<short-hash>` is the first 7 characters and `<commit-url>` is the full commit URL:
-`https://github.com/{owner}/{repo}/commit/{full-hash}`
-
-### For inline review comments
-
-Reply to the review comment thread:
-
-```bash
-gh api repos/{owner}/{repo}/pulls/{number}/comments/{comment_id}/replies \
-  -f body='Addressed in [`abcdef0`](https://github.com/owner/repo/commit/abcdef0123456789)'
-```
-
-The `comment_id` is the `id` of the first comment in the thread (the one that started the review thread).
-
-Then resolve the thread. Use `gh pr review` or the REST API to mark the thread as resolved:
-
-```bash
-gh api repos/{owner}/{repo}/pulls/{number}/comments/{comment_id} \
-  -X PATCH \
-  -f body="$(gh api repos/{owner}/{repo}/pulls/{number}/comments/{comment_id} --jq '.body')"
-```
-
-If `gh` supports resolving threads directly (e.g., `gh pr thread resolve`), prefer that. Otherwise, the reply with "Addressed" is sufficient — the reviewer can resolve on their end.
-
-### For general PR comments
-
-Reply in the PR conversation:
-
-```bash
-gh pr comment {number} --body 'Addressed [this comment](comment-url) in [`abcdef0`](https://github.com/owner/repo/commit/abcdef0123456789)'
-```
-
-Include a link back to the original comment so the reply has clear context.
-
-### Request re-review from bots
-
-After commits have been pushed and replies are posted, ask each automated reviewer to re-review — but **only the bots whose comments you actually addressed in this round**. Don't ping a bot whose feedback you skipped or that wasn't involved in the changes you just pushed; that creates noise and trains reviewers to ignore your pings.
-
-Post the re-review request as a follow-up reply on the same thread where the bot left its comment (or as a top-level PR comment if the bot's review was a top-level review).
-
-**Mention format — this is the part that's easy to get wrong:**
-
-GitHub names bot accounts with a `[bot]` suffix by default (e.g., `review-bot[bot]`, `github-actions[bot]`). To @-mention them in a comment, you **must include the `[bot]` suffix**, otherwise the mention won't resolve to the bot account and the bot won't be notified.
-
-- **Bad:** `@review-bot please review again` — this @-mentions a non-existent user account or the wrong account, and the bot will not be triggered.
-- **Good:** `@review-bot[bot] please review again` — this resolves to the bot account.
-
-The only exception is if you have direct evidence that a specific bot accepts mentions **without** the `[bot]` suffix. For example, Claude's GitHub app responds to both `@claude` and `@claude[bot]` — either works. Some self-hosted or custom integrations behave the same way. Default to `[bot]` unless you know otherwise — check the `user.login` field from the API response you fetched in Phase 1 and use that exact string. If `user.login` is `review-bot[bot]`, mention it as `@review-bot[bot]`.
-
-**Example re-review request:**
-
-```bash
-gh api repos/{owner}/{repo}/pulls/{number}/comments/{comment_id}/replies \
-  -f body='@review-bot[bot] please review again — addressed in [`abcdef0`](https://github.com/owner/repo/commit/abcdef0123456789)'
-```
-
-You can combine the "Addressed in <commit>" reply and the re-review ping into a single comment, as shown above, rather than posting two separate replies on the same thread.
+Once the commit exists, apply **§5 (Reply and resolve)** to reply `Addressed in <hash>` on each
+addressed thread and resolve the inline threads, then apply **§6 (Re-request review)** to ping only
+the bots whose change requests you actually addressed, using each bot's correct trigger.
 
 ### After all replies are posted
 
-Tell the user which comments were replied to, which bots (if any) were asked to re-review, and provide the PR URL so they can verify.
+Tell the user which comments were replied to, which bots (if any) were asked to re-review, and the PR
+URL so they can verify.

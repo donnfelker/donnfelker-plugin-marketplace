@@ -1,8 +1,8 @@
 # Durable Spec Development Plugin
 
-Three skills that together take a written specification all the way from "plan on paper" to "every subtask shipped as a merged PR with every review comment addressed."
+Four skills that together take a written specification all the way from "plan on paper" to "every subtask shipped as a merged PR with every review comment addressed."
 
-The trio is designed for the case where a single planning document or audit produces many actionable subtasks and the work needs to outlast a single attention span — formal tracking, stacked PRs, multi-round review response.
+They're designed for the case where a single planning document or audit produces many actionable subtasks and the work needs to outlast a single attention span — formal tracking, stacked PRs, multi-round review response.
 
 ## Skills
 
@@ -28,16 +28,22 @@ Walks through the open PR on the current branch, fetches inline review comments 
 
 See [`skills/address-pr-comments/SKILL.md`](skills/address-pr-comments/SKILL.md) for the full six-phase workflow. Useful standalone for any PR, and pairs naturally with `implement-full-spec`'s Phase C review-response loop when you want a guided pass over a single PR rather than the full stack.
 
+### `pr-autopilot`
+
+The unattended counterpart to `address-pr-comments`: point it at a single PR and it loops on its own — each round it fetches unaddressed reviews/comments, addresses the actionable ones, commits and pushes, replies and resolves the threads, and re-requests review from the bots whose change requests it addressed — until a quiet round (or a `--max-rounds` / `--time-cap` safety cap) is reached, then prints a results summary. It commits and pushes without asking (no approval gate), and it addresses human comments but never blocks the loop waiting on a person.
+
+See [`skills/pr-autopilot/SKILL.md`](skills/pr-autopilot/SKILL.md). It shares the GitHub review mechanics in [`references/pr-review-mechanics.md`](references/pr-review-mechanics.md) with `address-pr-comments` and `implement-full-spec`'s Phase C — each skill supplies its own control flow (interactive single pass, autonomous loop, or stacked-PR sweep) over the same fetch/classify/reply/re-request layer.
+
 ## How They Compose
 
-`plan-to-tickets` is the front of the pipeline — turn the spec into trackable work. `implement-full-spec` is the back of the pipeline — turn the trackable work into merged code. `address-pr-comments` is the per-PR review-response tool you reach for any time a single PR has unresolved comments. Any of the three can be used standalone, but the natural sequence is:
+`plan-to-tickets` is the front of the pipeline — turn the spec into trackable work. `implement-full-spec` is the back of the pipeline — turn the trackable work into merged code. `address-pr-comments` and `pr-autopilot` are the per-PR review-response tools — the first for a guided single pass, the second for a hands-off loop — that you reach for any time a single PR has unresolved comments. Any of them can be used standalone, but the natural sequence is:
 
 1. Write the plan (or receive the audit / RFC / multi-finding report).
 2. Run `plan-to-tickets` to land it in the tracker as a phase/task hierarchy with dependencies wired.
 3. Run `implement-full-spec` against that parent ticket to ship every subtask as its own stacked PR and drive each PR to merge-ready.
-4. For any single PR that needs a focused review-response pass, run `address-pr-comments`.
+4. For any single PR that needs a focused review-response pass, run `address-pr-comments` (guided) or `pr-autopilot` (unattended).
 
-The three skills share a worldview: surprises at scale are worse than slowdowns, the structure of the plan should survive an interrupted session, and the orchestration should not silently downscope when the work gets noisy.
+The skills share a worldview: surprises at scale are worse than slowdowns, the structure of the plan should survive an interrupted session, and the orchestration should not silently downscope when the work gets noisy.
 
 ## License
 

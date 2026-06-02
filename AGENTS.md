@@ -62,7 +62,7 @@ description: What this skill does and when to use it. Include trigger phrases.
 - No consecutive hyphens (`--`)
 - Must match parent directory name exactly
 
-**Valid**: `git-commit`, `prd-generator`, `triangulated-code-review`
+**Valid**: `git-worktree`, `prd-generator`, `triangulated-code-review`
 **Invalid**: `Git-Commit`, `-prd`, `code--review`
 
 ### Optional Skill Directories
@@ -114,7 +114,7 @@ The `description` is critical for skill discovery. Include:
 Always write the description as a single line. Do not use YAML block scalars (`>`, `|`, `>-`, `|-`). The description must be under 1024 characters.
 
 ```yaml
-description: When the user wants to format a git commit message. Use when the user mentions "commit this," "write a commit message," or "commit format." For code review, see triangulated-code-review.
+description: When the user wants to create or manage git worktrees. Use when the user mentions "create a worktree," "list worktrees," or "parallel branches." For release notes, see generate-release-notes.
 ```
 
 ## Claude Code Plugin
@@ -138,7 +138,7 @@ See [Claude Code plugins documentation](https://code.claude.com/docs/en/plugins.
 
 ### Commit Messages
 
-ALWAYS invoke the `git-commit` skill before writing any commit message. The skill is located at `plugins/git-commit/skills/git-commit/SKILL.md`. Read it and follow its formatting rules for every commit.
+Write commit messages following the [Conventional Commits v1.0.0](https://www.conventionalcommits.org/) specification: `type(scope): description` with a valid type (`feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`) and a lowercase description. Squash merges use the PR title as the commit message, so the same rules apply there (see the PR Title Validation workflow).
 
 ### Pull Request Checklist
 

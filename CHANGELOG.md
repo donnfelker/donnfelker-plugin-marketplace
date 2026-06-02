@@ -4,17 +4,18 @@ Current versions of all plugins. Compare against local versions to check for upd
 
 | Plugin | Version | Last Updated |
 |--------|---------|--------------|
-| git-commit | 1.1.0 | 2026-03-11 |
 | codebase-analyzer | 1.0.0 | 2026-02-27 |
 | git-worktree | 1.0.0 | 2026-02-27 |
 | generate-release-notes | 1.0.0 | 2026-03-02 |
-| pr-title | 1.0.0 | 2026-03-11 |
 | triangulated-code-review | 1.3.0 | 2026-05-22 |
 | durable-spec-development | 1.2.0 | 2026-05-22 |
 | find-past-conversation | 1.0.0 | 2026-05-22 |
 | skill-scout | 1.0.0 | 2026-05-29 |
 
 ## Recent Changes
+
+### 2026-06-02
+- Removed the `git-commit` and `pr-title` plugins. Agents now format Conventional Commit messages and PR titles by default, so the dedicated skills were redundant. Removed both plugin directories, their marketplace entries, and all references across `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, and the remaining plugins' cross-references. The PR title validation GitHub Actions workflow (`.github/workflows/pr-lint-title.yml`) is retained — it enforces Conventional Commit PR titles independently of any skill — with its skill-reference tips removed.
 
 ### 2026-05-29
 - Added `skill-scout` plugin: scouts an agent conversation — the current session by default, or a past `.jsonl` transcript under `~/.claude/projects/` when asked — for skill opportunities and produces a `# Skill Scout Report` in chat. Detects five signals (manual workflows worth packaging, existing-skill output that had to be corrected, repeated user corrections, reusable multi-step research, and skill content to simplify or remove), inventories existing skills across repo-local / user / cache / mounted sources and tracks each skill's origin so edits route to the right place (direct Edit for editable sources, print-and-hand-off for read-only caches and mounts), then hands off to `/skill-creator` for new skills or edits the affected SKILL.md directly. Generalized from an internal version — no company-specific marketplace assumptions.

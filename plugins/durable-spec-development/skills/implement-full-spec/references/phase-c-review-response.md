@@ -189,7 +189,9 @@ For Phase C the choice between "do it myself inline" and "dispatch an Agent" is 
 |---|---|
 | 1–2 trivial edits (e.g., comment-only changes) | Inline via Edit tool |
 | 3+ items, or any item that requires test additions | One-shot Agent call with the comment specs and the resolve pattern baked in |
-| Architectural fix from a review | Full Dev → QA → Reviewer like Phase B |
+| Architectural fix from a review | Run the [`dev-team`](../../dev-team/SKILL.md) skill on the review's spec, just like Phase B — then push and reply |
+
+**`dev-team` commits but does not push.** It stops at an APPROVED & COMMITTED SHA; pushing the branch, posting the `Addressed in <SHA>` reply, resolving threads, and the re-review ping all stay with you — i.e., the push step onward in this sweep. Don't post the reply until you've pushed the SHA `dev-team` returned — otherwise the comment links a commit the forge doesn't have yet.
 
 When dispatching an Agent for Phase C, pre-supply: the unresolved thread / review bodies (verbatim), the resolve template, and the reply template. See [`prompt-templates.md#phase-c-single-pr-agent-for-prs-with-multiple-comments-to-address`](prompt-templates.md#phase-c-single-pr-agent-for-prs-with-multiple-comments-to-address) for a ready-to-fill prompt.
 

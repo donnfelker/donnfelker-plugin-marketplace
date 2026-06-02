@@ -1,8 +1,8 @@
 # Durable Spec Development Plugin
 
-Three skills that together take a written specification all the way from "plan on paper" to "every subtask shipped as a merged PR with every review comment addressed."
+Four skills that together take a written specification all the way from "plan on paper" to "every subtask shipped as a merged PR with every review comment addressed." Three are pipeline stages; the fourth, `dev-team`, is the reusable engine that does the actual building and is invokable on its own.
 
-The trio is designed for the case where a single planning document or audit produces many actionable subtasks and the work needs to outlast a single attention span — formal tracking, stacked PRs, multi-round review response.
+The set is designed for the case where a single planning document or audit produces many actionable subtasks and the work needs to outlast a single attention span — formal tracking, stacked PRs, multi-round review response.
 
 ## Skills
 
@@ -17,10 +17,16 @@ See [`skills/plan-to-tickets/SKILL.md`](skills/plan-to-tickets/SKILL.md) for the
 Turns a parent ticket with N actionable subtasks into a clean stack of N pull requests, then drives that stack to merge-ready by addressing every bot and human review comment, re-requesting review each round until reviewers are satisfied. Three phases:
 
 - **Phase A — Plan**: read the parent, filter actionable subtasks, design stack order, pin execution parameters.
-- **Phase B — Execute**: per subtask, worktree → Dev → QA → Reviewer → commit → push → `gh pr create` with the right base → mark complete.
+- **Phase B — Execute**: per subtask, worktree → run the `dev-team` loop (Dev → QA → Reviewer → commit) → push → `gh pr create` with the right base → mark complete.
 - **Phase C — Respond to feedback**: sweep every PR for all three comment sources (inline threads, top-level review bodies, general comments), classify, fix, commit, push, reply with `Addressed in <SHA>`, cascade-rebase downstream PRs, then ping the reviewing bot for re-review. Multi-round until quiet.
 
 See [`skills/implement-full-spec/SKILL.md`](skills/implement-full-spec/SKILL.md) for the top-level workflow and the four reference files under [`skills/implement-full-spec/references/`](skills/implement-full-spec/references/) for the per-phase mechanics and cross-cutting gotchas.
+
+### `dev-team`
+
+Drives a single unit of work — one spec, ticket, finding, or change request — from spec to a committed, reviewed result with a dev team of agents: Dev → QA → Reviewer/code-review → commit, bounded by a cycle cap. It runs the roles as a real agent team where the harness provides one (else coordinated subagents), so it works across agents and models. This is the engine behind `implement-full-spec`'s Phase B — that skill calls `dev-team` once per subtask, then layers on the stacking, PR, and review-response machinery — but it is equally useful standalone: fire it off on whatever change you're working on right now when you want it built, independently verified, and code-reviewed before it lands, rather than a quick inline edit. It commits but does not push; pushing and opening a PR are the caller's call.
+
+See [`skills/dev-team/SKILL.md`](skills/dev-team/SKILL.md) for the loop contract, execution model, cycle cap, and role-collapsing guidance, and [`skills/dev-team/references/prompt-templates.md`](skills/dev-team/references/prompt-templates.md) for the Dev/QA/Reviewer prompt skeletons.
 
 ### `address-pr-comments`
 
@@ -30,14 +36,14 @@ See [`skills/address-pr-comments/SKILL.md`](skills/address-pr-comments/SKILL.md)
 
 ## How They Compose
 
-`plan-to-tickets` is the front of the pipeline — turn the spec into trackable work. `implement-full-spec` is the back of the pipeline — turn the trackable work into merged code. `address-pr-comments` is the per-PR review-response tool you reach for any time a single PR has unresolved comments. Any of the three can be used standalone, but the natural sequence is:
+`plan-to-tickets` is the front of the pipeline — turn the spec into trackable work. `implement-full-spec` is the back of the pipeline — turn the trackable work into merged code, calling `dev-team` once per subtask to do the actual build-verify-review. `dev-team` is that engine, factored out so you can also fire it off on a single change without the full-spec scaffolding. `address-pr-comments` is the per-PR review-response tool you reach for any time a single PR has unresolved comments. Any of them can be used standalone, but the natural sequence is:
 
 1. Write the plan (or receive the audit / RFC / multi-finding report).
 2. Run `plan-to-tickets` to land it in the tracker as a phase/task hierarchy with dependencies wired.
 3. Run `implement-full-spec` against that parent ticket to ship every subtask as its own stacked PR and drive each PR to merge-ready.
 4. For any single PR that needs a focused review-response pass, run `address-pr-comments`.
 
-The three skills share a worldview: surprises at scale are worse than slowdowns, the structure of the plan should survive an interrupted session, and the orchestration should not silently downscope when the work gets noisy.
+The skills share a worldview: surprises at scale are worse than slowdowns, the structure of the plan should survive an interrupted session, and the orchestration should not silently downscope when the work gets noisy.
 
 ## License
 

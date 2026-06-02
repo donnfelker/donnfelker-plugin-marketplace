@@ -27,7 +27,7 @@
     {
       "name": "durable-spec-development",
       "source": "./plugins/durable-spec-development",
-      "description": "End-to-end durable spec workflow. Bundles plan-to-tickets (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown), implement-full-spec (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review), and address-pr-comments (review and address unresolved GitHub PR comments on the current branch)."
+      "description": "End-to-end durable spec workflow. Bundles plan-to-tickets (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown), implement-full-spec (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review), dev-team (drive a single unit of work from spec to a committed, reviewed result with an agent team of Dev, QA, and Reviewer roles — usable standalone or as the per-subtask engine behind implement-full-spec), and address-pr-comments (review and address unresolved GitHub PR comments on the current branch)."
     },
     {
       "name": "find-past-conversation",

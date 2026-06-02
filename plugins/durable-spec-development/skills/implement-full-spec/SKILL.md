@@ -37,10 +37,12 @@ This skill has three distinct phases. They share state (the worktree set, the or
 | Phase | What happens | Trigger |
 |---|---|---|
 | **A. Plan** | Read parent, filter actionable subtasks, design the stack order, pin execution parameters. | First user message with a parent ticket URL. |
-| **B. Execute** | For each subtask in order: worktree → Dev → QA → Reviewer → commit → push → `gh pr create --base <stack-parent>` → mark ticket complete. | After Phase A is approved. |
+| **B. Execute** | For each subtask in order: worktree → run the `dev-team` loop (Dev → QA → Reviewer → commit) → push → `gh pr create --base <stack-parent>` → mark ticket complete. | After Phase A is approved. |
 | **C. Respond to feedback** | Sweep every PR for inline-thread + top-level-review + general-comment feedback. Classify, fix, commit, push, reply with `Addressed in <SHA>`, cascade-rebase downstream PRs, then ping `@<bot> re-review`. Multi-round until reviewers stop flagging things. | After Phase B is open on the forge, OR triggered fresh ("address all the comments on these PRs"). |
 
-Phase A and B are well-covered by `references/phase-a-plan.md` and `references/phase-b-execute-subtask.md`. Phase C is in `references/phase-c-review-response.md`. Common gotchas across phases are in `references/gotchas.md`. The Dev/QA/Reviewer prompt skeletons live in `references/prompt-templates.md`.
+Phase A and B are well-covered by `references/phase-a-plan.md` and `references/phase-b-execute-subtask.md`. Phase C is in `references/phase-c-review-response.md`. Common gotchas across phases are in `references/gotchas.md`. The Phase C agent skeleton and the Phase A kickoff prompt live in `references/prompt-templates.md`.
+
+**The per-subtask Dev → QA → Reviewer loop is its own skill.** Phase B does not implement the loop inline — it calls the [`dev-team`](../dev-team/SKILL.md) skill once per subtask to drive that subtask's spec to a committed, reviewed result, then layers on the stacking, PR, and ticket machinery that's specific to this skill. That keeps the loop reusable: you can fire it off directly on a single change without the full-spec scaffolding. Everything about how that loop runs lives in `dev-team` — this skill delegates to it and never reimplements those mechanics (see "The per-subtask loop, cycle cap, and role collapsing" below).
 
 **For full execution, read the three phase files in order.** For a partial invocation (e.g., the user asks only "respond to comments on the PRs we already opened"), read the relevant phase file directly.
 
@@ -67,10 +69,11 @@ PHASE B — Execute (per subtask, serially in A/B; serial-or-parallel in C)
    For each subtask in order:
    • Set up worktree per the chosen mode (one shared for A; per-subtask
      for B/C, branched off the planned parent).
-   • Dispatch a one-shot Dev Agent with verbatim spec + IN/OUT scope.
-   • Dispatch a one-shot QA Agent ("trust nothing"). On FAIL → dev cycle.
-   • Dispatch a one-shot Reviewer (or combined QA+Reviewer for small tickets).
-   • On APPROVED: commit (the reviewer/combined agent does this), push.
+   • Run the `dev-team` skill on this subtask's spec:
+       Dev → QA → Reviewer/code-review → commit, bounded by a cycle cap.
+       It returns an APPROVED & COMMITTED SHA (or escalates). The loop
+       commits but does NOT push — that's this phase's job.
+   • Push the returned commit.
    • Open PR — varies by mode:
        - Mode A: defer; open one PR at the end of the run.
        - Mode B: `gh pr create --base <stack-parent>` after each subtask.
@@ -100,33 +103,20 @@ PHASE C — Respond to feedback (after PRs are open OR on demand)
    • Multi-round: bots often respond to re-review with NEW items. Repeat.
 ```
 
-## When to collapse roles
+## The per-subtask loop, cycle cap, and role collapsing
 
-The Dev → QA → Reviewer pipeline is full-fat for architectural changes but collapses down to 2 or even 1 agent for simpler subtasks. Decide per-subtask based on spec complexity, not the whole stack at once. See `references/phase-b-execute-subtask.md` ("Collapsing roles for smaller subtasks") for the decision table.
+The per-subtask loop — its cycle cap, role-collapsing decision table, agent-team execution model, and commit hard rules — lives in the [`dev-team`](../dev-team/SKILL.md) skill. Phase B calls it once per subtask; read its SKILL.md for the mechanics and the operational cap value. The one knob this skill surfaces is the cycle cap, which Phase A pins as an execution parameter (its default mirrors dev-team's); otherwise this skill delegates the loop and doesn't reimplement it.
 
-Cycle cap: 3 Dev → QA → Reviewer cycles total per subtask. After cycle 3 the stack is blocked because downstream subtasks need this branch as their base. Escalate to the user with current diff + failing test output + reviewer's last feedback. Do not silently retry past 3.
+Two stack-specific consequences worth stating here:
 
-## When to use teams vs one-shot Agent calls
-
-**Default to one-shot `Agent` calls per role.** Each is isolated, the result returns through the tool call, and the orchestrator dispatches the next role.
-
-Use `TeamCreate` **only** when an agent needs to remember state across review cycles on the same subtask — and even then, scope the team to one subtask, never share across subtasks. Teams have three documented failure modes for this kind of orchestration:
-
-- Teams share a TaskList; orchestrator-created tasks leak to teammates who auto-claim them and start doing the wrong work.
-- Idle notifications fire every 10–15s from waiting teammates, consuming orchestrator context.
-- Most subtasks pass on cycle 1 — there's no state to preserve across cycles, so the team overhead buys nothing.
-
-If you do use a team, never put orchestrator-side tracking in any TaskList. Track parent-level progress in conversation memory only.
+- **The cycle cap blocks the stack.** When a subtask exhausts the cycle cap without an APPROVED commit, downstream subtasks can't proceed — they need this branch as their base. Escalate to the user (the loop hands you the diff + failing output + last feedback); do not silently retry past the cap.
+- **Each subtask gets its own dev team; never share one across subtasks.** Keep your parent-level progress tracking out of any shared TaskList the teammates can see (it leaks and they auto-claim the wrong work) — track it in conversation memory. See the dev-team skill's "Team guardrails" for the rest.
 
 ## Hard rules (do not relax without explicit user override)
 
-- **No `--no-verify`** on commits. Hook failures are signal; fix the code.
-- **No `git add -A` / `git add .`** — stage by name to avoid sweeping in unrelated worktree leftovers.
-- **No amend** by default. Add a new commit on top. The one place amend is correct: a bot explicitly flags the original commit's subject/body (e.g., "subject 75 chars > 72") — fix that with `git rebase -i HEAD~N` + `reword`, then force-push and cascade the stack.
-- **Don't touch the operator's primary checkout.** Every per-subtask agent works exclusively in its `~/.claude-worktrees/<branch>/`.
-- **Verbatim spec in every Dev/QA/Reviewer prompt.** Do not summarize. The prompt is the contract.
-- **Mental-revert clause in every QA prompt.** "If the fix were reverted, which test would fail? If none, the tests are theater."
-- **Explicit IN/OUT-of-scope partition** for every remediation bullet in the Dev prompt.
+The loop's own commit-and-workspace invariants — no `--no-verify`, no `git add -A`, no amend by default, don't touch the operator's primary checkout, verbatim spec, mental-revert clause, IN/OUT-of-scope partition — are owned by the [`dev-team`](../dev-team/SKILL.md) skill and inherited by every per-subtask agent. The rules below are the ones **specific to driving a stack of PRs**, which the loop knows nothing about:
+
+- **Amend is the stack's call, not the loop's.** The loop never amends. The one place amend is correct: a bot explicitly flags the original commit's subject/body (e.g., "subject 75 chars > 72") — fix that with `git rebase -i HEAD~N` + `reword`, then force-push and cascade the stack.
 - **Stack-aware rebases** after every push: `git rebase --onto <new-base> <local-old-upstream>`. See `references/gotchas.md` for why the naive `<old-upstream-on-origin>` form breaks once upstream has been force-pushed.
 - **Three comment sources** in Phase C. Inline review threads + top-level review bodies + issue-level comments. Missing the top-level-review fetch is a documented failure mode; `references/gotchas.md` has the GraphQL/REST snippets that get all three.
 - **Reply format**: `Addressed in [\`<short-sha>\`](<commit-url>)`. Inline threads get a `resolveReviewThread` GraphQL mutation; top-level reviews and general comments don't have a resolve op, just the reply.
@@ -136,16 +126,17 @@ If you do use a team, never put orchestrator-side tracking in any TaskList. Trac
 
 The Phase A plan is a starting hypothesis, not a contract. Three things will almost certainly change in flight:
 
-1. **Role collapsing.** A run might start full-fat 3-agent and discover ticket #5 is trivial enough to single-shot. Switch when the evidence supports it.
-2. **Cycle cap behavior.** The plan says escalate at cycle 3. When the user has explicitly said "don't stop until done," push the cap with judgment — but report any cycle-3 hit even when continuing past it.
+1. **Role collapsing.** A run might start full-fat 3-agent and discover ticket #5 is trivial enough to single-shot. Switch when the evidence supports it — the `dev-team` skill makes this decision per subtask.
+2. **Cycle cap behavior.** The loop escalates when its cycle cap is exhausted. When the user has explicitly said "don't stop until done," push the cap with judgment — but report any cap hit even when continuing past it.
 3. **Conflict resolution patterns during cascade-rebase.** Architectural changes (auth token format, API shapes) tend to mutate across the stack. The same conflict shape recurs; resolve it consistently. `references/gotchas.md` has a worked example.
 
 If a documented step is producing pain instead of value, change it and write the change down. The plan file at `~/.claude/plans/<task>.md` is the persistence path across context resets — update it; don't pretend the old version still applies.
 
 ## Pointers
 
+- [`dev-team`](../dev-team/SKILL.md) — the per-subtask Dev → QA → Reviewer/code-review → commit loop, cycle cap, role collapsing, commit hard rules, and the Dev/QA/Reviewer prompt skeletons. Phase B calls this once per subtask.
 - `references/phase-a-plan.md` — survey the parent, filter, design the stack, present the plan
-- `references/phase-b-execute-subtask.md` — the per-subtask Dev → QA → Reviewer loop in mechanical detail
+- `references/phase-b-execute-subtask.md` — the per-subtask flow: worktree → loop → push → PR → ticket, in mechanical detail
 - `references/phase-c-review-response.md` — three-source fetch + classify + fix + reply + cascade-rebase + re-review ping
-- `references/prompt-templates.md` — Dev / QA / Reviewer / combined skeletons; copy-paste
+- `references/prompt-templates.md` — Phase C agent skeleton + Phase A kickoff prompt; copy-paste
 - `references/gotchas.md` — cross-cutting traps: jq+control-chars, three-source fetch, rebase --onto, force-push-with-lease, amend-vs-new-commit, evolving-API conflicts

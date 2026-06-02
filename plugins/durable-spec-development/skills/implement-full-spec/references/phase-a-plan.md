@@ -105,7 +105,8 @@ Once PR strategy is chosen, the other parameters follow. Surface them to the ope
 |---|---|---|
 | **Worktrees** | yes (per-subtask) · no (shared checkout) | yes for Mode B / C; no for Mode A |
 | **Concurrency** | strict serial · N-parallel | strict serial for Mode A and Mode B; up to N-parallel for Mode C's independent subtasks |
-| **Cycle cap** | bounded (recommend 3) · unbounded | 3, then escalate |
+| **Cycle cap** | bounded (recommend 3, mirroring the `dev-team` default) · unbounded | 3, then escalate |
+| **Canonical checks** | the exact typecheck/lint/test commands the operator expects green | required — the `dev-team` takes these as a contract input per subtask, so pin them now |
 | **Tier boundaries** (Mode B/C only) | pause for go/no-go · continue with sweep | continue with quick sweep |
 | **Stop condition** | each tier · all subtasks · only on hard block | all subtasks, only stop on hard block |
 
@@ -161,7 +162,7 @@ Save the plan to `~/.claude/plans/<task-slug>.md` so it survives context resets.
 - The execution parameters with their pinned values
 - The branch + worktree + parent-branch table from Step 6
 - The escalation contract (what counts as "hard block")
-- The verification commands the user expects on the final state
+- The canonical checks (typecheck/lint/test commands) — both the per-subtask set the loop runs and the verification commands the user expects on the final state
 
 This file is the persistence path. Re-read it after every few subtasks. If the plan is producing pain (e.g., a Mode C dependency classification turns out to be wrong), update the file and write down why.
 

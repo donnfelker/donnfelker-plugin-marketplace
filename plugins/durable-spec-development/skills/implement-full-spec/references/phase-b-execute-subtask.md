@@ -6,23 +6,19 @@ This file is the per-subtask loop. It runs once for each filtered subtask, in st
 
 ```
 For each subtask N in stack order:
-  ┌────────────────────────────────────────────────┐
-  │ 1. Set up the worktree                          │
-  │ 2. Update ticket status → "in progress"         │
-  │ 3. Dev Agent (one-shot, verbatim spec)          │
-  │ 4. QA Agent (one-shot, "trust nothing")         │
-  │      ↑ ←─── on FAIL, re-dispatch dev with feedback │
-  │ 5. Reviewer Agent (one-shot)                    │
-  │      ↑ ←─── on REJECT, back to Dev (cycle)      │
-  │ 6. Commit (inside reviewer or by orchestrator)  │
-  │ 7. Push + gh pr create --base <stack-parent>    │
-  │ 8. Comment SHA + branch + PR URL on the ticket  │
-  │ 9. Mark ticket complete                         │
-  └────────────────────────────────────────────────┘
-  advance to N+1, parent = N's branch
+  ┌────────────────────────────────────────────────────────┐
+  │ 1. Set up the worktree                                  │
+  │ 2. Update ticket status → "in progress"                 │
+  │ 3. Run the dev-team skill on this subtask               │
+  │      → returns an APPROVED & COMMITTED SHA, or escalates│
+  │ 4. Push the returned commit + gh pr create (mode-dep.)  │
+  │ 5. Comment SHA + branch + PR URL; mark ticket complete  │
+  │ 6. Advance to N+1, parent = N's branch                  │
+  │ 7. (Mode A only) Open the single PR after the last one  │
+  └────────────────────────────────────────────────────────┘
 ```
 
-Cycle cap: 3 Dev → QA → Reviewer cycles total. Hit it → escalate, do NOT silently retry.
+The Dev → QA → Reviewer loop itself — including its cycle cap and role collapsing — is the [`dev-team`](../../dev-team/SKILL.md) skill. This phase is the wrapper around it: set up the worktree, run the loop, then push / open the PR / close the ticket. When the loop escalates (cycle cap hit), the stack is blocked — see Escalations below.
 
 ## Step 1: Set up the worktree
 
@@ -84,48 +80,25 @@ Examples by tracker:
 
 This is intentional friction — it broadcasts that work has started, useful when other humans are watching the tracker.
 
-## Step 3: Dispatch the Dev Agent
+## Step 3: Run the dev-team skill
 
-Use a single `Agent` tool call. Pass the verbatim subtask spec, worktree path, branch name, stack-parent name, IN/OUT-of-scope partition for every remediation bullet, and the expected return format. The full skeleton is in [`prompt-templates.md#dev-agent-phase-b`](prompt-templates.md#dev-agent-phase-b).
+This is where the subtask actually gets implemented, verified, reviewed, and committed. Do **not** re-implement the Dev → QA → Reviewer cycle here — invoke the [`dev-team`](../../dev-team/SKILL.md) skill and let it drive the cycle.
 
-Critical content:
+Hand the loop this subtask's contract:
 
-- **Verbatim spec**. No summarization. Including severity, file paths + line numbers, description, impact, every remediation bullet.
+- **Workspace**: the worktree path from Step 1 and the branch name.
+- **Verbatim spec**: the full subtask spec — severity, file paths + line numbers, description, impact, every remediation bullet. No summarization.
 - **IN/OUT-of-scope partition** for every bullet. If a bullet requires infrastructure outside the repo (creating a GitHub App, provisioning a KV namespace, deploying a sidecar), mark it OUT OF SCOPE with the proposed follow-up ticket name.
-- **CLAUDE.md reference**. Do not re-list conventions. Just say "follow CLAUDE.md conventions" and trust inheritance.
-- **Worktree restriction**. Explicitly say "Do not touch <operator's primary checkout path>." The agent should `cd <worktree>` and stay there.
-- **Do NOT commit**. Leave changes unstaged. The orchestrator (or reviewer agent) handles commit so the message is consistent.
-- **READY report format**. Files changed grouped by package, approach summary, tests added, deferred items, anything escalated.
+- **Canonical checks**: the exact commands the operator expects green (typecheck, lint, the specific package test suites, integration tests if applicable).
+- **Stack note**: this branch stacks on `<upstream subtasks>` — tell the Dev to leverage their primitives.
 
-## Step 4: Dispatch the QA Agent
+The loop returns an **APPROVED & COMMITTED** SHA, or it escalates (cycle cap hit, spec ambiguity, out-of-scope infrastructure). It commits but does **not** push — that's Step 4. On escalation, the stack is blocked; surface it per Escalations below rather than advancing.
 
-After Dev returns READY, dispatch a one-shot QA. The full skeleton is in [`prompt-templates.md#qa-agent-phase-b`](prompt-templates.md#qa-agent-phase-b).
+The loop owns its own execution model, cycle cap, role collapsing, commit hard rules, and prompt skeletons. Read the `dev-team` SKILL.md for those mechanics and the operational cap value — this file doesn't re-document them. (Phase A pins the cap as a planning parameter; that default should mirror dev-team's.)
 
-Critical content:
+## Step 4: Push the commit (and open the PR if appropriate)
 
-- **"Trust nothing — verify by reading code and running tests yourself."** Without this opener, QA tends to rubber-stamp.
-- **Mental-revert clause**: "For each new test, ask: if you reverted the fix to its previous form, which assertions would fail? If none, the tests are theater. Flag that."
-- **Bullet-by-bullet verification.** For each remediation bullet from the spec, find the code that addresses it, verify the implementation actually achieves the bullet's intent (not log-only, not partial).
-- **Canonical checks**. The exact commands the operator expects to be green (typecheck, lint, the specific package test suites, integration tests if applicable).
-- **PASSED / FAILED return format.** On FAILED, itemize: `file:line — severity — proposed remediation`. Nits-only findings → PASSED with nits noted.
-
-On FAILED return: re-dispatch the Dev with the QA's itemized findings as additional context. This is cycle 2. Cap at 3.
-
-## Step 5: Dispatch the Reviewer Agent
-
-After QA PASSED, dispatch a one-shot Reviewer. For trivial tickets, combine QA and Reviewer into one agent. The skeleton is in [`prompt-templates.md#reviewer--commit-agent-phase-b`](prompt-templates.md#reviewer--commit-agent-phase-b).
-
-Critical content:
-
-- **Read the diff first.** Not the dev's claims, the actual diff.
-- **Code-review skill**: use `superpowers:requesting-code-review` if available.
-- **Manual checklist**: correctness, security, style per CLAUDE.md, no new deps, no back-compat shims, imports clean.
-- **APPROVED → commit.** The reviewer is the agent that creates the commit. Conventional commit message; subject ≤72 chars; body lists what changed and why + deferred items + Closes link.
-- **REJECTED → itemized list of changes needed.** Back to Dev (cycle 2/3).
-
-## Step 6: Push the commit (and open the PR if appropriate)
-
-After the Reviewer returns APPROVED & COMMITTED (with a SHA), the orchestrator pushes. **Whether to open the PR right now depends on the mode.**
+After the loop returns APPROVED & COMMITTED (with a SHA), the orchestrator pushes. **Whether to open the PR right now depends on the mode.**
 
 ### Mode A — Single PR
 
@@ -199,7 +172,7 @@ EOF
 
 Be explicit in the PR body when the PR has a non-`main` base — reviewers won't intuit dependency relationships from branch names alone.
 
-## Step 7: Close the loop on the ticket
+## Step 5: Close the loop on the ticket
 
 After the commit lands (and the PR is open, if appropriate for the mode), comment on the source ticket with the addressing artifacts and mark complete.
 
@@ -217,7 +190,7 @@ Resolved in <full-sha> on <branch>, PR: <url>
 
 Then update status to `complete` (or equivalent). The ticket now records SHA + branch + PR URL (or pending status, for Mode A), which lets future archaeology re-find the work.
 
-## Step 8: Advance
+## Step 6: Advance
 
 The next subtask's parent depends on the mode:
 
@@ -229,7 +202,7 @@ The next subtask's parent depends on the mode:
 
 Don't re-fetch the parent or re-derive the queue — both are already in the Phase A plan. Move on.
 
-## Step 9 (Mode A only): Open the PR after the final subtask
+## Step 7 (Mode A only): Open the PR after the final subtask
 
 For Mode A, when the last subtask in the run has been committed and pushed, open one PR covering the whole batch:
 
@@ -264,23 +237,12 @@ Then go back to the tracker and update each subtask's "PR pending" comment with 
 
 These conditions mean STOP and report to the operator. Do not silently retry:
 
-- **Cycle cap exceeded** (3 Dev → QA → Reviewer iterations on the same subtask). Report: current diff, the failing tests, the reviewer's last feedback, what cycle 4 might try.
-- **Stack-broken conflict** (the rebase from prior subtasks introduced a real conflict the dev can't trivially resolve). Surface the conflicting hunks.
-- **Spec ambiguity** (the remediation bullets contradict each other or the audit's stated impact doesn't match the proposed fix). Don't guess; ask.
-- **Out-of-scope infrastructure required for the minimum credible fix** (e.g., the bullet says "create a new GitHub App" — that's an operator action, not an in-repo edit). Surface and decide together.
+- **The loop escalated** — cycle cap exhausted on the subtask, spec ambiguity, or out-of-scope infrastructure required. The `dev-team` skill surfaces these with the diff, failing output, and last feedback; relay that to the operator. A cycle-cap escalation blocks the stack, since downstream subtasks need this branch as their base.
+- **Stack-broken conflict** (the rebase from prior subtasks introduced a real conflict the dev can't trivially resolve). This one is Phase B's own — it lives in the worktree setup / advance steps, not inside the loop. Surface the conflicting hunks.
 
 ## Collapsing roles for smaller subtasks
 
-The table from SKILL.md, repeated for convenience:
-
-| Subtask signal | Pattern | Agent calls per ticket |
-|---|---|---|
-| Architectural change, multi-package, type changes, new infrastructure | Separate Dev, QA, Reviewer+commit | 3 |
-| Single package, 2–5 files, no API change | Dev → combined QA+Reviewer+commit | 2 |
-| One file, one comment, trivial fix | Single Dev+verify+commit agent | 1 |
-| Cycle 2+ on any subtask | Always keep Dev separate so it can see the specific feedback | n |
-
-Don't pre-commit to one pattern across the whole stack. Decide per subtask based on the spec's complexity.
+Role collapsing (full 3-agent vs combined QA+Reviewer vs single-shot) is decided per subtask **inside the loop** — it's owned by the [`dev-team`](../../dev-team/SKILL.md) skill, which has the decision table. Don't pre-commit to one pattern across the whole stack; let the loop pick based on each subtask's complexity.
 
 ## What this phase produces
 

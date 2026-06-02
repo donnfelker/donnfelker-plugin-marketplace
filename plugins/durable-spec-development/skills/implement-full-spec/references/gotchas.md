@@ -175,6 +175,8 @@ Pre-commit hooks run on every commit unless you pass `--no-verify`. Hook failure
 
 **The fix**: track multi-subtask progress in conversation memory only. Never put orchestrator-level tasks into a TaskList that any subagent can see. For 24 subtasks, the progress queue is small enough — a simple inline list of "P1: X ✓ → Y ✓ → Z" is sufficient.
 
+**This is not an argument against teams per se.** The `dev-team` skill runs each *subtask's* Dev/QA/Reviewer roles as an agent team on purpose — that's fine, because that team is scoped to one unit of work. The failure here was an *orchestrator-level, cross-subtask* TaskList shared with a team, which is the one thing to avoid. Keep the parent-level progress queue private to the orchestrator; let each subtask's `dev-team` own its own scoped team. See the `dev-team` skill's "Team guardrails".
+
 ## 10. Bot re-review pings don't trigger immediate response
 
 After posting `@<bot> re-review`, the bot typically responds in seconds to a few minutes — but not synchronously. Don't sleep-poll for the response. If the operator is watching, they'll see it land; if you need to address the response, it'll arrive as a new comment when you next triage that PR.

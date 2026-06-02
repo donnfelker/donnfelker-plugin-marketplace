@@ -44,7 +44,7 @@ Instructions for the agent go here...
 
 ### 4. Follow the naming conventions
 
-- **Directory name**: lowercase, kebab-case (e.g., `git-commit`)
+- **Directory name**: lowercase, kebab-case (e.g., `git-worktree`)
 - **Name field**: must match directory name exactly
 - **Description**: include trigger phrases for reliable activation
 

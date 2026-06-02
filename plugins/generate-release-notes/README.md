@@ -1,6 +1,6 @@
 # Generate Release Notes Plugin
 
-Generates release notes and changelogs by parsing [Conventional Commits](https://www.conventionalcommits.org/) from git log history. Designed to work with the [git-commit](../git-commit/) plugin's structured commit format.
+Generates release notes and changelogs by parsing [Conventional Commits](https://www.conventionalcommits.org/) from git log history.
 
 ## What It Does
 

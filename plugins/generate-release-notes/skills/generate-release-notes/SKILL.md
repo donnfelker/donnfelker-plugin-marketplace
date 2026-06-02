@@ -1,6 +1,6 @@
 ---
 name: generate-release-notes
-description: This skill should be used when the user asks to "generate release notes", "generate changelog", "create release notes", "write changelog", "what changed since last release", "prepare release notes", "update changelog", or "summarize changes from git history". Parses conventional commit messages to produce categorized, well-formatted release notes or changelog entries. For commit message formatting, see git-commit.
+description: This skill should be used when the user asks to "generate release notes", "generate changelog", "create release notes", "write changelog", "what changed since last release", "prepare release notes", "update changelog", or "summarize changes from git history". Parses conventional commit messages to produce categorized, well-formatted release notes or changelog entries.
 ---
 
 # Release Notes Generator

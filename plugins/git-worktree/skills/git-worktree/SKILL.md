@@ -1,6 +1,6 @@
 ---
 name: git-worktree
-description: Manages git worktrees for parallel branch development including listing, creating, removing, and switching between worktrees with consistent naming conventions. This skill should be used when the user says "create a worktree", "add a worktree", "list worktrees", "remove worktree", "delete worktree", "clean up worktrees", "work on multiple branches", "parallel branches", "git worktree", or when managing multiple branch checkouts simultaneously. For commit message formatting, see git-commit.
+description: Manages git worktrees for parallel branch development including listing, creating, removing, and switching between worktrees with consistent naming conventions. This skill should be used when the user says "create a worktree", "add a worktree", "list worktrees", "remove worktree", "delete worktree", "clean up worktrees", "work on multiple branches", "parallel branches", "git worktree", or when managing multiple branch checkouts simultaneously.
 ---
 
 # Git Worktree Management Skill

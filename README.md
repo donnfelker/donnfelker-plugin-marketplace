@@ -17,11 +17,9 @@ Plugins are packages of skills, commands, agents, and hooks that extend Claude C
 <!-- PLUGINS:START -->
 | Plugin | Description |
 |--------|-------------|
-| [git-commit](plugins/git-commit/) | Formats git commit messages following [Conventional Commits v1.0.0](https://www.conventionalcommits.org/) with prose quality principles from [cbeams' git commit standards](https://cbea.ms/git-commit/) |
 | [codebase-analyzer](plugins/codebase-analyzer/) | Multi-phase technical analysis of codebases covering architecture, code quality, testing, and infrastructure |
 | [git-worktree](plugins/git-worktree/) | Manages git worktrees for parallel branch development with consistent naming conventions |
 | [generate-release-notes](plugins/generate-release-notes/) | Generates release notes and changelogs from [Conventional Commits](https://www.conventionalcommits.org/) parsed from git log history |
-| [pr-title](plugins/pr-title/) | Generates PR titles following the [Conventional Commits v1.0.0](https://www.conventionalcommits.org/) specification |
 | [triangulated-code-review](plugins/triangulated-code-review/) | Triangulated multi-reviewer code review orchestrator. Borrows from research methodology — checks each finding against multiple independent reviewers (comprehensive, security, codex, codex adversarial) to reduce blind spots, then runs a QA analyst pass that substantiates every finding (verifying any third-party library claims via the context7 MCP) and demotes unsubstantiated ones into a dedicated "Invalidated Findings" section of the prioritized, timestamped report |
 | [durable-spec-development](plugins/durable-spec-development/) | End-to-end durable spec workflow. Bundles `plan-to-tickets` (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown), `implement-full-spec` (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review), and `address-pr-comments` (review and address unresolved GitHub PR comments on the current branch) |
 | [find-past-conversation](plugins/find-past-conversation/) | Searches past Claude Code session transcripts under `~/.claude/projects/` to find a previous conversation by recalled keyword or phrase, then optionally reports the outcome (commit, branch, PR opened, merged) |
@@ -39,7 +37,7 @@ Use [npx skills](https://github.com/vercel-labs/skills) to install skills direct
 npx skills add donnfelker/donnfelker-plugin-marketplace
 
 # Install specific plugins
-npx skills add donnfelker/donnfelker-plugin-marketplace --skill git-commit
+npx skills add donnfelker/donnfelker-plugin-marketplace --skill git-worktree
 
 # List available plugins
 npx skills add donnfelker/donnfelker-plugin-marketplace --list
@@ -56,7 +54,7 @@ Install via Claude Code's built-in plugin system:
 /plugin marketplace add donnfelker/donnfelker-plugin-marketplace
 
 # Install a specific plugin
-/plugin install git-commit@donnfelker-plugins
+/plugin install git-worktree@donnfelker-plugins
 ```
 
 ### Option 3: Clone and Copy
@@ -65,7 +63,7 @@ Clone the repo and copy the plugins you want:
 
 ```bash
 git clone https://github.com/donnfelker/donnfelker-plugin-marketplace.git
-cp -r donnfelker-plugin-marketplace/plugins/git-commit .claude/plugins/
+cp -r donnfelker-plugin-marketplace/plugins/git-worktree .claude/plugins/
 ```
 
 ### Option 4: Git Submodule
@@ -93,7 +91,7 @@ Use [SkillKit](https://github.com/rohitg00/skillkit) to install skills across mu
 npx skillkit install donnfelker/donnfelker-plugin-marketplace
 
 # Install specific plugins
-npx skillkit install donnfelker/donnfelker-plugin-marketplace --skill git-commit
+npx skillkit install donnfelker/donnfelker-plugin-marketplace --skill git-worktree
 
 # List available plugins
 npx skillkit install donnfelker/donnfelker-plugin-marketplace --list
@@ -104,23 +102,23 @@ npx skillkit install donnfelker/donnfelker-plugin-marketplace --list
 Once installed, just use the skills naturally:
 
 ```
-"Commit this"
-→ Uses git-commit plugin
+"Create a worktree for this branch"
+→ Uses git-worktree plugin
 
-"Write a commit message for these changes"
-→ Uses git-commit plugin
+"Generate release notes since the last release"
+→ Uses generate-release-notes plugin
 ```
 
 Or invoke skills directly:
 
 ```
-/git-commit-formatter
+/generate-release-notes
 ```
 
 ## Plugin Categories
 
 ### Git & Dev Workflow
-- `git-commit` — Commit message formatting based on Chris Beams' seven rules
+- `git-worktree` — Manage git worktrees for parallel branch development
 
 ### Documentation
 - Coming soon
@@ -154,7 +152,7 @@ This matters because GitHub's **squash merge** uses the PR title as the resultin
 feat(auth): tos-123 add login support
 ```
 
-If a PR title fails validation, the error message includes the expected format and a tip to use the `/pr-title` skill for auto-formatting.
+If a PR title fails validation, the error message includes the expected format so you can correct the title.
 
 ## Contributing
 

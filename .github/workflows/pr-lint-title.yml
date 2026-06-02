@@ -36,5 +36,3 @@ jobs:
 
             Format: type(scope): [ticket] description
             Example: feat(auth): tos-123 add login support
-
-            Tip: Use the /git-commit skill to auto-format your commit message.

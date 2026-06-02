@@ -1,11 +1,7 @@
 # PR Review Mechanics (shared)
 
-This is the shared, **control-flow-free** mechanics layer for working with GitHub PR reviews. It is
-consumed by several skills in this plugin:
-
-- `address-pr-comments` — one interactive pass, asks before editing, does not auto-commit.
-- `pr-autopilot` — autonomous multi-round loop that commits, pushes, and re-requests review.
-- `implement-full-spec` (Phase C) — the stacked-PR variant, which layers cascade-rebase on top.
+This is the shared, **control-flow-free** mechanics layer for working with GitHub PR reviews, consumed
+by the PR skills in this plugin.
 
 It deliberately contains **no approval gates, no commit policy, and no loop control** — those belong
 to each calling skill, because that's exactly what differs between them. This file answers only the

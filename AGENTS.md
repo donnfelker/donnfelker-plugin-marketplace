@@ -62,7 +62,7 @@ description: What this skill does and when to use it. Include trigger phrases.
 - No consecutive hyphens (`--`)
 - Must match parent directory name exactly
 
-**Valid**: `git-worktree`, `prd-generator`, `triangulated-code-review`
+**Valid**: `codebase-analyzer`, `prd-generator`, `triangulated-code-review`
 **Invalid**: `Git-Commit`, `-prd`, `code--review`
 
 ### Optional Skill Directories
@@ -114,7 +114,7 @@ The `description` is critical for skill discovery. Include:
 Always write the description as a single line. Do not use YAML block scalars (`>`, `|`, `>-`, `|-`). The description must be under 1024 characters.
 
 ```yaml
-description: When the user wants to create or manage git worktrees. Use when the user mentions "create a worktree," "list worktrees," or "parallel branches." For release notes, see generate-release-notes.
+description: When the user wants a technical analysis of a codebase. Use when the user mentions "analyze this codebase," "architecture review," or "what does this repo do." For release notes, see generate-release-notes.
 ```
 
 ## Claude Code Plugin

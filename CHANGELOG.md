@@ -5,7 +5,6 @@ Current versions of all plugins. Compare against local versions to check for upd
 | Plugin | Version | Last Updated |
 |--------|---------|--------------|
 | codebase-analyzer | 1.0.0 | 2026-02-27 |
-| git-worktree | 1.0.0 | 2026-02-27 |
 | generate-release-notes | 1.0.0 | 2026-03-02 |
 | triangulated-code-review | 1.3.0 | 2026-05-22 |
 | durable-spec-development | 1.2.0 | 2026-05-22 |
@@ -15,6 +14,7 @@ Current versions of all plugins. Compare against local versions to check for upd
 ## Recent Changes
 
 ### 2026-06-02
+- Removed the `git-worktree` plugin. Agents create and manage git worktrees on their own by default, so the dedicated skill was redundant. Removed the plugin directory, its marketplace entry, the CHANGELOG version-table row, and all references across `README.md`, `AGENTS.md`, and `CONTRIBUTING.md` (illustrative naming/description examples re-pointed to `codebase-analyzer`). Legitimate `git worktree` command usage in other plugins (e.g. `durable-spec-development`) is unaffected.
 - Removed the `git-commit` and `pr-title` plugins. Agents now format Conventional Commit messages and PR titles by default, so the dedicated skills were redundant. Removed both plugin directories, their marketplace entries, and all references across `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, and the remaining plugins' cross-references. The PR title validation GitHub Actions workflow (`.github/workflows/pr-lint-title.yml`) is retained — it enforces Conventional Commit PR titles independently of any skill — with its skill-reference tips removed.
 
 ### 2026-05-29

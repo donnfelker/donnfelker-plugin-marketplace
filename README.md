@@ -18,7 +18,6 @@ Plugins are packages of skills, commands, agents, and hooks that extend Claude C
 | Plugin | Description |
 |--------|-------------|
 | [codebase-analyzer](plugins/codebase-analyzer/) | Multi-phase technical analysis of codebases covering architecture, code quality, testing, and infrastructure |
-| [git-worktree](plugins/git-worktree/) | Manages git worktrees for parallel branch development with consistent naming conventions |
 | [generate-release-notes](plugins/generate-release-notes/) | Generates release notes and changelogs from [Conventional Commits](https://www.conventionalcommits.org/) parsed from git log history |
 | [triangulated-code-review](plugins/triangulated-code-review/) | Triangulated multi-reviewer code review orchestrator. Borrows from research methodology — checks each finding against multiple independent reviewers (comprehensive, security, codex, codex adversarial) to reduce blind spots, then runs a QA analyst pass that substantiates every finding (verifying any third-party library claims via the context7 MCP) and demotes unsubstantiated ones into a dedicated "Invalidated Findings" section of the prioritized, timestamped report |
 | [durable-spec-development](plugins/durable-spec-development/) | End-to-end durable spec workflow. Bundles `plan-to-tickets` (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown), `implement-full-spec` (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review), and `address-pr-comments` (review and address unresolved GitHub PR comments on the current branch) |
@@ -37,7 +36,7 @@ Use [npx skills](https://github.com/vercel-labs/skills) to install skills direct
 npx skills add donnfelker/donnfelker-plugin-marketplace
 
 # Install specific plugins
-npx skills add donnfelker/donnfelker-plugin-marketplace --skill git-worktree
+npx skills add donnfelker/donnfelker-plugin-marketplace --skill codebase-analyzer
 
 # List available plugins
 npx skills add donnfelker/donnfelker-plugin-marketplace --list
@@ -54,7 +53,7 @@ Install via Claude Code's built-in plugin system:
 /plugin marketplace add donnfelker/donnfelker-plugin-marketplace
 
 # Install a specific plugin
-/plugin install git-worktree@donnfelker-plugins
+/plugin install codebase-analyzer@donnfelker-plugins
 ```
 
 ### Option 3: Clone and Copy
@@ -63,7 +62,7 @@ Clone the repo and copy the plugins you want:
 
 ```bash
 git clone https://github.com/donnfelker/donnfelker-plugin-marketplace.git
-cp -r donnfelker-plugin-marketplace/plugins/git-worktree .claude/plugins/
+cp -r donnfelker-plugin-marketplace/plugins/codebase-analyzer .claude/plugins/
 ```
 
 ### Option 4: Git Submodule
@@ -91,7 +90,7 @@ Use [SkillKit](https://github.com/rohitg00/skillkit) to install skills across mu
 npx skillkit install donnfelker/donnfelker-plugin-marketplace
 
 # Install specific plugins
-npx skillkit install donnfelker/donnfelker-plugin-marketplace --skill git-worktree
+npx skillkit install donnfelker/donnfelker-plugin-marketplace --skill codebase-analyzer
 
 # List available plugins
 npx skillkit install donnfelker/donnfelker-plugin-marketplace --list
@@ -102,11 +101,11 @@ npx skillkit install donnfelker/donnfelker-plugin-marketplace --list
 Once installed, just use the skills naturally:
 
 ```
-"Create a worktree for this branch"
-→ Uses git-worktree plugin
-
 "Generate release notes since the last release"
 → Uses generate-release-notes plugin
+
+"Analyze this codebase and write up the architecture"
+→ Uses codebase-analyzer plugin
 ```
 
 Or invoke skills directly:
@@ -118,7 +117,7 @@ Or invoke skills directly:
 ## Plugin Categories
 
 ### Git & Dev Workflow
-- `git-worktree` — Manage git worktrees for parallel branch development
+- Coming soon
 
 ### Documentation
 - Coming soon

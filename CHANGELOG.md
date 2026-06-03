@@ -10,8 +10,12 @@ Current versions of all plugins. Compare against local versions to check for upd
 | durable-spec-development | 1.4.0 | 2026-06-02 |
 | find-past-conversation | 1.0.0 | 2026-05-22 |
 | skill-scout | 1.0.0 | 2026-05-29 |
+| multi-llm-convergence | 0.2.0 | 2026-06-03 |
 
 ## Recent Changes
+
+### 2026-06-03
+- Bumped `multi-llm-convergence` to v0.2.0: added a set of general behavioral rules (adapted from [Andrej Karpathy's `CLAUDE.md`](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md)) whose goal is to prevent over-engineered solutions — Think Before Coding, Simplicity First, Surgical Changes, and Goal-Driven Execution. The rules live in a new `references/coding-guidelines.md` and bind both roles in the loop: the driver follows them when applying findings (Steps 4 & 6 now point at the file), and the reviewers hold the artifact to them — the shared review contract in `references/reviewer-dispatch.md` now instructs reviewers to report violations (speculative features, needless abstraction, non-surgical edits, missing success criteria) as findings at the appropriate severity. Also added the previously-missing `multi-llm-convergence` rows to this version table and the README plugins table (the plugin shipped in #17 without them).
 
 ### 2026-06-02
 - Bumped `durable-spec-development` to v1.4.0: extracted the per-subtask Dev → QA → Reviewer/code-review → commit loop out of `implement-full-spec` into a new standalone `dev-team` skill. The new skill owns the loop contract (workspace, verbatim spec, IN/OUT-of-scope partition, canonical checks, commit-only terminus), a model-agnostic agent-team execution model (run the Dev/QA/Reviewer roles as a real agent team where the harness provides one — e.g. Claude Code's `TeamCreate`/`SendMessage` — falling back to coordinated subagents otherwise, so the skill works across agents and models), the 3-cycle cap, the role-collapsing decision table, team guardrails, the commit/workspace hard rules, and the Dev/QA/Reviewer/combined prompt skeletons — so the loop can be fired off directly on a single change. `implement-full-spec` now delegates the loop to it once per subtask and keeps only the stacking, PR-creation, ticket, and review-response orchestration: Phase B's old Dev/QA/Reviewer steps collapse into one "run the loop" step (later steps renumbered), the loop skeletons move out of its `prompt-templates.md` (only the Phase C per-PR agent and Phase A kickoff remain), and Phase A now pins the canonical checks the loop requires. Reviewed both skills with the skill-reviewer.

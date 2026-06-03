@@ -38,6 +38,11 @@
       "name": "skill-scout",
       "source": "./plugins/skill-scout",
       "description": "Scouts an agent conversation (current or a past saved transcript) for skill opportunities and produces a markdown report of recommended new skills, edits to existing ones, and content to simplify, then hands off to /skill-creator or edits the affected SKILL.md directly."
+    },
+    {
+      "name": "multi-llm-convergence",
+      "source": "./plugins/multi-llm-convergence",
+      "description": "Drives any artifact (plan, PRD, design doc, spec, or implementation diff) to convergence by alternating two genuinely different LLM reviewers — a Codex reviewer and an independent Claude review subagent — applying each round's findings and looping until both independently agree it clears the bar. Grounds offline reviewers in local source-of-truth clones, runs a liveness watchdog so a silent reviewer can't hang the loop, and commits per round for an auditable trail. The iterate-to-consensus counterpart to triangulated-code-review's single parallel pass."
     }
   ]
 }

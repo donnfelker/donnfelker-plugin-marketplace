@@ -43,7 +43,7 @@ jq '.[].body' /tmp/reviews.json
 
 ## 3. Cascade-rebase: capture the old parent tip BEFORE fetching
 
-**The failure**: when PR N's parent (PR N-1) gets force-pushed after a review-response commit, PR N's branch is now stacked on a SHA that no longer exists at the tip of the parent branch. Running `git rebase origin/<parent-branch>` will try to re-apply commits that conceptually are already in the new parent (just at different SHAs), producing duplicate-commit conflicts that look bewildering ("why is git trying to apply the GEO-004 commit again? it's already in the base!").
+**The failure**: when PR N's parent (PR N-1) gets force-pushed after a review-response commit, PR N's branch is now stacked on a SHA that no longer exists at the tip of the parent branch. Running `git rebase origin/<parent-branch>` will try to re-apply commits that conceptually are already in the new parent (just at different SHAs), producing duplicate-commit conflicts that look bewildering ("why is git trying to apply the PROJ-004 commit again? it's already in the base!").
 
 The natural recovery — "find the SHA my branch was based on by reading `git log`" — has a subtle failure mode of its own: on round 2+ of Phase C the branch has multiple subtask commits, the "first commit" is no longer at `HEAD~1`, and the visually-identified boundary is wrong. Picking the wrong SHA silently mangles the diff.
 
@@ -110,7 +110,7 @@ When the rebase is needed, the non-interactive recipe is:
 ```bash
 # Pre-set the variables — substitute concrete values, don't leave <angle-brackets> in the command.
 SHORT=eca52af                                   # short SHA of the commit to reword
-NEW_MSG='fix(security): GEO-024 remove anonymous userId fallback'
+NEW_MSG='fix(security): PROJ-024 remove anonymous userId fallback'
 
 # Edit the todo list to change "pick <SHORT>" to "reword <SHORT>".
 # Edit the commit message via GIT_EDITOR to write NEW_MSG directly.
@@ -131,9 +131,9 @@ After amending: `gh pr edit <n> --title "$NEW_MSG"` to keep the PR title aligned
 **The failure**: in the audit, the internal HMAC token format mutated 5 times across the 24-PR stack:
 
 ```
-GEO-004:  ${peer}.${scopes}.${ts}.${hmac}              (4-part)
-GEO-007:  ${peer}.${scopes}.${act}.${ts}.${hmac}       (5-part, added `act`)
-GEO-013:  ${peer}.${scopes}.${act}.${nonce}.${ts}.${hmac}  (6-part, added `nonce`)
+PROJ-004:  ${peer}.${scopes}.${ts}.${hmac}              (4-part)
+PROJ-007:  ${peer}.${scopes}.${act}.${ts}.${hmac}       (5-part, added `act`)
+PROJ-013:  ${peer}.${scopes}.${act}.${nonce}.${ts}.${hmac}  (6-part, added `nonce`)
 ```
 
 When PR #29's review fix moved the scope-check after HMAC verification, the conflict in `auth.ts` re-occurred on every downstream PR (#34, #41) that had touched the same area with its own evolution of the token format. The conflict shape was the same each time — three-way merge of:
@@ -171,9 +171,11 @@ Pre-commit hooks run on every commit unless you pass `--no-verify`. Hook failure
 
 ## 9. Conversation memory > shared TaskList for cross-agent state
 
-**The failure**: the first audit attempt created a TaskList with 27 entries (one per subtask) at the orchestrator level, then spawned a team. Teammates spawned into the team auto-claimed the orchestrator's tasks and started working on the wrong tickets. Dev tried to start GEO-002 while in the middle of GEO-003. QA tried to start GEO-004 instead of QA'ing GEO-003.
+**The failure**: the first audit attempt created a TaskList with 27 entries (one per subtask) at the orchestrator level, then spawned a team. Teammates spawned into the team auto-claimed the orchestrator's tasks and started working on the wrong tickets. Dev tried to start PROJ-002 while in the middle of PROJ-003. QA tried to start PROJ-004 instead of QA'ing PROJ-003.
 
 **The fix**: track multi-subtask progress in conversation memory only. Never put orchestrator-level tasks into a TaskList that any subagent can see. For 24 subtasks, the progress queue is small enough — a simple inline list of "P1: X ✓ → Y ✓ → Z" is sufficient.
+
+**This is not an argument against teams per se.** The `dev-team` skill runs each *subtask's* Dev/QA/Reviewer roles as an agent team on purpose — that's fine, because that team is scoped to one unit of work. The failure here was an *orchestrator-level, cross-subtask* TaskList shared with a team, which is the one thing to avoid. Keep the parent-level progress queue private to the orchestrator; let each subtask's `dev-team` own its own scoped team. See the `dev-team` skill's "Team guardrails".
 
 ## 10. Bot re-review pings don't trigger immediate response
 

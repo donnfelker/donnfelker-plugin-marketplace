@@ -26,7 +26,7 @@ GitHub stores PR feedback in three places. Each has a separate API endpoint. **Y
 | **Top-level review bodies** | The text the reviewer writes in the review form before submitting "Approve / Comment / Request changes" | `gh api repos/{owner}/{repo}/pulls/{n}/reviews` | No — no resolve op |
 | **General issue comments** | Comments posted directly on the PR conversation timeline (e.g., bot summary posts, "@somebody re-review" pings) | `gh api repos/{owner}/{repo}/issues/{n}/comments` | No — no resolve op |
 
-A `claude[bot]` "Code review" post is usually a general comment OR a top-level review body. A `geo-inspect[bot]` "CHANGES_REQUESTED" review is a top-level review body with no inline threads. Either way: if you only check `reviewThreads`, you miss it.
+A `claude[bot]` "Code review" post is usually a general comment OR a top-level review body. A `proj-inspect[bot]` "CHANGES_REQUESTED" review is a top-level review body with no inline threads. Either way: if you only check `reviewThreads`, you miss it.
 
 ## Sweep order
 
@@ -189,7 +189,9 @@ For Phase C the choice between "do it myself inline" and "dispatch an Agent" is 
 |---|---|
 | 1–2 trivial edits (e.g., comment-only changes) | Inline via Edit tool |
 | 3+ items, or any item that requires test additions | One-shot Agent call with the comment specs and the resolve pattern baked in |
-| Architectural fix from a review | Full Dev → QA → Reviewer like Phase B |
+| Architectural fix from a review | Run the [`dev-team`](../../dev-team/SKILL.md) skill on the review's spec, just like Phase B — then push and reply |
+
+**`dev-team` commits but does not push.** It stops at an APPROVED & COMMITTED SHA; pushing the branch, posting the `Addressed in <SHA>` reply, resolving threads, and the re-review ping all stay with you — i.e., the push step onward in this sweep. Don't post the reply until you've pushed the SHA `dev-team` returned — otherwise the comment links a commit the forge doesn't have yet.
 
 When dispatching an Agent for Phase C, pre-supply: the unresolved thread / review bodies (verbatim), the resolve template, and the reply template. See [`prompt-templates.md#phase-c-single-pr-agent-for-prs-with-multiple-comments-to-address`](prompt-templates.md#phase-c-single-pr-agent-for-prs-with-multiple-comments-to-address) for a ready-to-fill prompt.
 
@@ -204,7 +206,7 @@ Run the canonical checks before committing. Same commands as Phase B. Don't comm
 ```
 docs(security): reference WEBHOOK_KEY_DEFAULT_TTL_DAYS in comments
 
-Addresses geo-inspect review on PR #36: literal "90 days" restated
+Addresses proj-inspect review on PR #36: literal "90 days" restated
 the WEBHOOK_KEY_DEFAULT_TTL_DAYS constant value. Updated comments
 in types.ts, automations.ts, and the SQL migration.
 
@@ -295,7 +297,7 @@ Different review bots accept different re-trigger phrases. Use the documented on
 | `gemini-code-assist[bot]` | `@gemini-code-assist review` | Google's Gemini PR-review bot. |
 | `sweep-ai[bot]` | `@sweep review` | Sweep AI. |
 | `qodo-merge-pro[bot]` / `pr-agent[bot]` | `/review` | Slash-command style, posted as a regular comment. |
-| Internal / custom org bots (e.g., `geo-inspect[bot]`) | Usually `@<bot-handle> re-review` | Confirm by reading the bot's documentation, its README, or its prior posts on the same PR. |
+| Internal / custom org bots (e.g., `proj-inspect[bot]`) | Usually `@<bot-handle> re-review` | Confirm by reading the bot's documentation, its README, or its prior posts on the same PR. |
 | Human reviewer | `@<github-handle> when you have a chance, ready for another look` | No automated re-trigger; the ping just notifies them. |
 
 **When the trigger phrase isn't documented:** check the bot's prior comments on this or any other PR — bots typically describe their trigger commands in their first post on a PR ("Comment `@<bot> review` to re-run me"). If still unknown, `@<bot-handle> re-review` is the safe default — most bots interpret `re-review` as a re-trigger; ones that don't will simply ignore the mention.

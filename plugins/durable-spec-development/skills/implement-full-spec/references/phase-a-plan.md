@@ -105,7 +105,8 @@ Once PR strategy is chosen, the other parameters follow. Surface them to the ope
 |---|---|---|
 | **Worktrees** | yes (per-subtask) · no (shared checkout) | yes for Mode B / C; no for Mode A |
 | **Concurrency** | strict serial · N-parallel | strict serial for Mode A and Mode B; up to N-parallel for Mode C's independent subtasks |
-| **Cycle cap** | bounded (recommend 3) · unbounded | 3, then escalate |
+| **Cycle cap** | bounded (recommend 3, mirroring the `dev-team` default) · unbounded | 3, then escalate |
+| **Canonical checks** | the exact typecheck/lint/test commands the operator expects green | required — the `dev-team` takes these as a contract input per subtask, so pin them now |
 | **Tier boundaries** (Mode B/C only) | pause for go/no-go · continue with sweep | continue with quick sweep |
 | **Stop condition** | each tier · all subtasks · only on hard block | all subtasks, only stop on hard block |
 
@@ -129,9 +130,9 @@ For each subtask in order, produce a row:
 
 | # | Subtask ID | Branch | Worktree | Parent branch |
 |---|---|---|---|---|
-| 1 | GEO-003 | `security/geo-003-...` | `~/.claude-worktrees/geo-003-.../` | `main` |
-| 2 | GEO-001 | `security/geo-001-...` | `~/.claude-worktrees/geo-001-.../` | `security/geo-003-...` |
-| 3 | GEO-004 | `security/geo-004-...` | `~/.claude-worktrees/geo-004-.../` | `security/geo-001-...` |
+| 1 | PROJ-003 | `security/proj-003-...` | `~/.claude-worktrees/proj-003-.../` | `main` |
+| 2 | PROJ-001 | `security/proj-001-...` | `~/.claude-worktrees/proj-001-.../` | `security/proj-003-...` |
+| 3 | PROJ-004 | `security/proj-004-...` | `~/.claude-worktrees/proj-004-.../` | `security/proj-001-...` |
 | ... | | | | |
 
 ### Mode C — Independent PRs with selective stacking
@@ -140,9 +141,9 @@ For each subtask, produce a row noting whether it stacks on a dependency or bran
 
 | # | Subtask ID | Branch | Worktree | Parent branch | Depends on |
 |---|---|---|---|---|---|
-| 1 | GEO-003 | `security/geo-003-...` | `~/.claude-worktrees/geo-003-.../` | `main` | — |
-| 2 | GEO-014 | `security/geo-014-...` | `~/.claude-worktrees/geo-014-.../` | `main` | — |
-| 3 | GEO-007 | `security/geo-007-...` | `~/.claude-worktrees/geo-007-.../` | `security/geo-004-...` | GEO-004 |
+| 1 | PROJ-003 | `security/proj-003-...` | `~/.claude-worktrees/proj-003-.../` | `main` | — |
+| 2 | PROJ-014 | `security/proj-014-...` | `~/.claude-worktrees/proj-014-.../` | `main` | — |
+| 3 | PROJ-007 | `security/proj-007-...` | `~/.claude-worktrees/proj-007-.../` | `security/proj-004-...` | PROJ-004 |
 
 The "Depends on" column is the output of Step 4's dependency analysis. Subtasks with no dependency get `main` as their parent.
 
@@ -161,7 +162,7 @@ Save the plan to `~/.claude/plans/<task-slug>.md` so it survives context resets.
 - The execution parameters with their pinned values
 - The branch + worktree + parent-branch table from Step 6
 - The escalation contract (what counts as "hard block")
-- The verification commands the user expects on the final state
+- The canonical checks (typecheck/lint/test commands) — both the per-subtask set the loop runs and the verification commands the user expects on the final state
 
 This file is the persistence path. Re-read it after every few subtasks. If the plan is producing pain (e.g., a Mode C dependency classification turns out to be wrong), update the file and write down why.
 

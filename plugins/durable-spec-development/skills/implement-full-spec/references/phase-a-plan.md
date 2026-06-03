@@ -130,9 +130,9 @@ For each subtask in order, produce a row:
 
 | # | Subtask ID | Branch | Worktree | Parent branch |
 |---|---|---|---|---|
-| 1 | GEO-003 | `security/geo-003-...` | `~/.claude-worktrees/geo-003-.../` | `main` |
-| 2 | GEO-001 | `security/geo-001-...` | `~/.claude-worktrees/geo-001-.../` | `security/geo-003-...` |
-| 3 | GEO-004 | `security/geo-004-...` | `~/.claude-worktrees/geo-004-.../` | `security/geo-001-...` |
+| 1 | PROJ-003 | `security/proj-003-...` | `~/.claude-worktrees/proj-003-.../` | `main` |
+| 2 | PROJ-001 | `security/proj-001-...` | `~/.claude-worktrees/proj-001-.../` | `security/proj-003-...` |
+| 3 | PROJ-004 | `security/proj-004-...` | `~/.claude-worktrees/proj-004-.../` | `security/proj-001-...` |
 | ... | | | | |
 
 ### Mode C — Independent PRs with selective stacking
@@ -141,9 +141,9 @@ For each subtask, produce a row noting whether it stacks on a dependency or bran
 
 | # | Subtask ID | Branch | Worktree | Parent branch | Depends on |
 |---|---|---|---|---|---|
-| 1 | GEO-003 | `security/geo-003-...` | `~/.claude-worktrees/geo-003-.../` | `main` | — |
-| 2 | GEO-014 | `security/geo-014-...` | `~/.claude-worktrees/geo-014-.../` | `main` | — |
-| 3 | GEO-007 | `security/geo-007-...` | `~/.claude-worktrees/geo-007-.../` | `security/geo-004-...` | GEO-004 |
+| 1 | PROJ-003 | `security/proj-003-...` | `~/.claude-worktrees/proj-003-.../` | `main` | — |
+| 2 | PROJ-014 | `security/proj-014-...` | `~/.claude-worktrees/proj-014-.../` | `main` | — |
+| 3 | PROJ-007 | `security/proj-007-...` | `~/.claude-worktrees/proj-007-.../` | `security/proj-004-...` | PROJ-004 |
 
 The "Depends on" column is the output of Step 4's dependency analysis. Subtasks with no dependency get `main` as their parent.
 

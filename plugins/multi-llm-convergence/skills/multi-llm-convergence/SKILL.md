@@ -128,7 +128,7 @@ Keep the user-facing summary tight; the per-round commits and the log are the so
 
 ## Edge cases & failure modes
 
-- **Only one reviewer is available** (e.g. Codex plugin not installed). You cannot do cross-model convergence with one model. Tell the user, and offer either (a) install the missing reviewer, or (b) proceed as a single-model iterate-to-clean loop, clearly labeled as NOT cross-model consensus. Don't silently degrade.
+- **Only one reviewer is available** (e.g. Codex plugin not installed). You cannot do cross-model convergence with one model. Tell the user, and offer either (a) install the Codex plugin from https://github.com/openai/codex-plugin-cc (then run `/codex:setup` to authenticate) and re-run, or (b) proceed as a single-model iterate-to-clean loop, clearly labeled as NOT cross-model consensus. Don't silently degrade.
 - **Reviewer returns prose instead of the JSON contract.** Re-request once with the schema restated. If it still won't comply, parse conservatively and note the degraded parsing in the log — never invent a `clears_bar` verdict the reviewer didn't give.
 - **A finding can't be verified against any source** (no local clone, claim depends on runtime data). Treat it like an unsubstantiated claim: record it, don't auto-apply a risky change on its basis, and flag it for the user.
 - **Artifact has no external deps.** Skip cloning; still name the in-repo source-of-truth paths so reviewers verify against code, not memory.

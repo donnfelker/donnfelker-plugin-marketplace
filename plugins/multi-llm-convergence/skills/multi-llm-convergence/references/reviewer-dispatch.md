@@ -56,7 +56,7 @@ Resolve the companion script path, trying in order, first hit wins:
 1. `$CLAUDE_PLUGIN_ROOT/scripts/codex-companion.mjs` (if `CLAUDE_PLUGIN_ROOT` is set)
 2. `find "$HOME/.claude/plugins" -path '*/codex/scripts/codex-companion.mjs' -print -quit 2>/dev/null`
 
-If neither resolves, Codex is not installed → see "Only one reviewer available" in SKILL.md edge cases.
+If neither resolves, Codex is not installed → tell the user to install the Codex plugin from https://github.com/openai/codex-plugin-cc (then run `/codex:setup` to authenticate); see "Only one reviewer available" in SKILL.md edge cases.
 
 **Primary (background + native job-control), so the watchdog can poll:**
 

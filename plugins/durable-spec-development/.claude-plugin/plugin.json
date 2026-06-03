@@ -1,6 +1,6 @@
 {
   "name": "durable-spec-development",
-  "description": "End-to-end durable spec workflow: import a structured plan into a task tracker (ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown fallback) as a ticket hierarchy, ship every actionable subtask as its own stacked pull request, and address unresolved PR review comments — driving each PR to merge-ready through multi-round bot and human review.",
-  "version": "1.3.0",
+  "description": "End-to-end durable spec workflow: import a structured plan into a task tracker (ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown fallback) as a ticket hierarchy, ship every actionable subtask as its own stacked pull request, and address unresolved PR review comments — driving each PR to merge-ready through multi-round bot and human review. Includes dev-team (the standalone per-subtask build → QA → review loop) and pr-autopilot (autonomously watching a single PR and looping through review rounds until they settle).",
+  "version": "1.4.0",
   "license": "MIT"
 }

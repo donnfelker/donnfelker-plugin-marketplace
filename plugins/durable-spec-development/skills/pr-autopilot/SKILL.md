@@ -81,6 +81,14 @@ for a person. Surface outstanding human items in the final report instead.
 If there are **no new actionable comments** and **no outstanding `CHANGES_REQUESTED` review from any
 bot**, this is a **quiet round** → go to Step 5 (finish and report). Otherwise continue.
 
+One more condition before calling it quiet: **each bot's most recent verdict must target the current
+HEAD commit, and no review run may still be in flight.** "No new comments at poll time" is not the
+same as "the bot has signed off on this HEAD" — review bots take a couple of minutes after a push or
+re-ping, and a new finding can land seconds after your poll. If you just pushed or just re-pinged a
+bot, treat its review as pending and poll again rather than concluding on a verdict for an older
+commit. When a bot's review runs as a CI job (e.g. a `claude-review` workflow), an in-progress check
+run on the PR is a reliable pending signal.
+
 ## Step 3 — Address, commit, push
 
 Make the changes (read context, fix, group items touching the same file, run the project's

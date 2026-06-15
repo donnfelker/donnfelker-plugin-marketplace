@@ -20,16 +20,6 @@
       "description": "Generates release notes and changelogs from conventional commit messages parsed from git log history"
     },
     {
-      "name": "triangulated-code-review",
-      "source": "./plugins/triangulated-code-review",
-      "description": "Triangulated multi-reviewer code review orchestrator. Borrows from research methodology — checks each finding against multiple independent reviewers (comprehensive, security, codex, codex adversarial) to reduce blind spots, then runs a QA analyst pass that substantiates every finding (verifying any third-party library claims via the context7 MCP) and demotes unsubstantiated ones into a dedicated 'Invalidated Findings' section of the prioritized, timestamped report."
-    },
-    {
-      "name": "durable-spec-development",
-      "source": "./plugins/durable-spec-development",
-      "description": "End-to-end durable spec workflow. Bundles plan-to-tickets (import a structured plan into ClickUp, Linear, Jira, Asana, Notion, GitHub Projects, or markdown), implement-full-spec (turn a parent ticket with N actionable subtasks into N stacked PRs and drive each to merge-ready through multi-round bot and human review), dev-team (drive a single unit of work from spec to a committed, reviewed result with an agent team of Dev, QA, and Reviewer roles — usable standalone or as the per-subtask engine behind implement-full-spec), address-pr-comments (review and address unresolved GitHub PR comments on the current branch), and pr-autopilot (autonomously watch a single PR and loop through review rounds until they settle)."
-    },
-    {
       "name": "find-past-conversation",
       "source": "./plugins/find-past-conversation",
       "description": "Searches past Claude Code session transcripts to find a previous conversation by recalled keyword or phrase, then optionally reports the outcome (commit, branch, PR opened, merged)."
@@ -38,11 +28,6 @@
       "name": "skill-scout",
       "source": "./plugins/skill-scout",
       "description": "Scouts an agent conversation (current or a past saved transcript) for skill opportunities and produces a markdown report of recommended new skills, edits to existing ones, and content to simplify, then hands off to /skill-creator or edits the affected SKILL.md directly."
-    },
-    {
-      "name": "multi-llm-convergence",
-      "source": "./plugins/multi-llm-convergence",
-      "description": "Drives any artifact (plan, PRD, design doc, spec, or implementation diff) to convergence by alternating two genuinely different LLM reviewers — a Codex reviewer and an independent Claude review subagent — applying each round's findings and looping until both independently agree it clears the bar. Grounds offline reviewers in local source-of-truth clones, runs a liveness watchdog so a silent reviewer can't hang the loop, and commits per round for an auditable trail."
     }
   ]
 }

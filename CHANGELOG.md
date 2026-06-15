@@ -6,12 +6,13 @@ Current versions of all plugins. Compare against local versions to check for upd
 |--------|---------|--------------|
 | codebase-analyzer | 1.0.0 | 2026-02-27 |
 | generate-release-notes | 1.0.0 | 2026-03-02 |
-| triangulated-code-review | 1.3.0 | 2026-05-22 |
-| durable-spec-development | 1.4.0 | 2026-06-02 |
 | find-past-conversation | 1.0.0 | 2026-05-22 |
 | skill-scout | 1.0.0 | 2026-05-29 |
 
 ## Recent Changes
+
+### 2026-06-15
+- **Breaking — moved the loop-workflow plugins to the new [`loop-skills`](https://github.com/donnfelker/loop-skills) marketplace.** Removed `triangulated-code-review`, `multi-llm-convergence`, and the `durable-spec-development` bundle from this marketplace (deleted the plugin directories and their `marketplace.json` entries and `README.md` rows). `durable-spec-development` was dissolved: its skills now ship as three independent plugins in `loop-skills` — `spec-development` (`plan-to-tickets` + `implement-full-spec`), `dev-team`, and `pr-autopilot`. The `address-pr-comments` skill was retired; its single-pass behavior is now `pr-autopilot --single-pass`, and `implement-full-spec` now depends on the `dev-team` and `pr-autopilot` plugins (preflight-checked). Reinstall from the new marketplace: `/plugin marketplace add donnfelker/loop-skills`, then `/plugin install spec-development@loop-skills` (plus `dev-team@loop-skills` and `pr-autopilot@loop-skills`), `triangulated-code-review@loop-skills`, and `multi-llm-convergence@loop-skills`.
 
 ### 2026-06-02
 - Bumped `durable-spec-development` to v1.4.0: extracted the per-subtask Dev → QA → Reviewer/code-review → commit loop out of `implement-full-spec` into a new standalone `dev-team` skill. The new skill owns the loop contract (workspace, verbatim spec, IN/OUT-of-scope partition, canonical checks, commit-only terminus), a model-agnostic agent-team execution model (run the Dev/QA/Reviewer roles as a real agent team where the harness provides one — e.g. Claude Code's `TeamCreate`/`SendMessage` — falling back to coordinated subagents otherwise, so the skill works across agents and models), the 3-cycle cap, the role-collapsing decision table, team guardrails, the commit/workspace hard rules, and the Dev/QA/Reviewer/combined prompt skeletons — so the loop can be fired off directly on a single change. `implement-full-spec` now delegates the loop to it once per subtask and keeps only the stacking, PR-creation, ticket, and review-response orchestration: Phase B's old Dev/QA/Reviewer steps collapse into one "run the loop" step (later steps renumbered), the loop skeletons move out of its `prompt-templates.md` (only the Phase C per-PR agent and Phase A kickoff remain), and Phase A now pins the canonical checks the loop requires. Reviewed both skills with the skill-reviewer.
